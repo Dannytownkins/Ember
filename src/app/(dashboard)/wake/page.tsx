@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { memories, profiles, users } from "@/lib/db/schema";
-import { eq, and, count as sqlCount } from "drizzle-orm";
+import { eq, and, isNull, count as sqlCount } from "drizzle-orm";
 import { ensureUser } from "@/lib/actions/profiles";
 import { WakePromptGenerator } from "@/components/wake-prompt-generator";
 import type { MemoryCategory } from "@/lib/db/schema";
@@ -27,7 +27,7 @@ export default async function WakePage() {
       count: sqlCount(),
     })
     .from(memories)
-    .where(eq(memories.profileId, profile.id))
+    .where(and(eq(memories.profileId, profile.id), isNull(memories.deletedAt)))
     .groupBy(memories.category);
 
   const countsMap: Record<MemoryCategory, number> = {

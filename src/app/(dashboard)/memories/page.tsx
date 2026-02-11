@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { users, profiles, memories } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { profiles, memories } from "@/lib/db/schema";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import { ensureUser } from "@/lib/actions/profiles";
 import { MemoryBrowser } from "@/components/memory-browser";
 
@@ -12,15 +12,18 @@ export default async function MemoriesPage() {
 
   const user = await ensureUser(clerkId);
 
+  const defaultProfile = await db.query.profiles.findFirst({
+    where: and(eq(profiles.userId, user.id), isNull(profiles.deletedAt)),
+    columns: { id: true },
+  });
+
   const userMemories = await db.query.memories.findMany({
-    where: eq(memories.profileId, (
-      await db.query.profiles.findFirst({
-        where: eq(profiles.userId, user.id),
-        columns: { id: true },
-      })
-    )?.id ?? ""),
+    where: and(
+      eq(memories.profileId, defaultProfile?.id ?? ""),
+      isNull(memories.deletedAt)
+    ),
     orderBy: [desc(memories.createdAt)],
-    limit: 50,
+    limit: 100,
   });
 
   return (
