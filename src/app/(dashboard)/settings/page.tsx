@@ -7,6 +7,7 @@ import { apiTokens } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { ApiTokenManager } from "@/components/api-token-manager";
 import { DataExportButton } from "@/components/data-export-button";
+import { TokenBudgetSlider } from "@/components/token-budget-slider";
 
 export default async function SettingsPage() {
   const { userId: clerkId } = await auth();
@@ -58,6 +59,16 @@ export default async function SettingsPage() {
                 </span>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Token Budget */}
+        <section>
+          <h2 className="font-display text-xl font-semibold text-ember-text">
+            Token Budget
+          </h2>
+          <div className="mt-4">
+            <TokenBudgetSlider initialBudget={user.tokenBudget} />
           </div>
         </section>
 

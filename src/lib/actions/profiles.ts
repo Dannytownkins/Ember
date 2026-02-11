@@ -66,6 +66,33 @@ export async function getProfilesAction(): Promise<
   }
 }
 
+export async function updateTokenBudgetAction(
+  budget: number
+): Promise<ActionState<{ tokenBudget: number }>> {
+  try {
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return { status: "error", error: "Not authenticated" };
+    }
+
+    if (budget < 2000 || budget > 32000) {
+      return { status: "error", error: "Budget must be between 2,000 and 32,000" };
+    }
+
+    const user = await ensureUser(clerkId);
+
+    await db
+      .update(users)
+      .set({ tokenBudget: budget })
+      .where(eq(users.id, user.id));
+
+    return { status: "success", data: { tokenBudget: budget } };
+  } catch (error) {
+    console.error("updateTokenBudgetAction error:", error);
+    return { status: "error", error: "Failed to update token budget" };
+  }
+}
+
 export async function getDefaultProfileAction(): Promise<
   ActionState<Profile>
 > {
