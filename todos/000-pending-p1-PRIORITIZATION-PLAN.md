@@ -10,9 +10,28 @@ dependencies: []
 
 ## Overview
 
-**Total P1 Issues**: 6 critical blocking issues
-**Estimated Total Effort**: 8-13 days
-**Recommended Approach**: Implement in 3 waves based on dependencies and impact
+**Total P1 Issues**: 6 critical blocking issues (4 active, 2 deferred)
+**Estimated Total Effort**: 9 days
+**Chosen Approach**: 9-day plan with Inngest queue
+
+## Decisions Made (2026-02-10)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Email Capture | **Phase 2** | Paste + screenshot enough to validate. Nobody's asked for it. |
+| Soft Delete | **Phase 1.5** (2 weeks post-launch) | Strong confirmation dialogs for now. Low user count = low risk. |
+| Queue System | **Inngest** | 4 hours vs 2 days. Managed retries + observability. $20/mo is nothing. |
+| Timeline | **9 days** | Secure MVP without over-engineering. |
+
+### Active P1 Work (9 days)
+1. Background Queue — Inngest (Days 1-2)
+2. API Layer for Agents (Days 3-5)
+3. Row-Level Security (Days 6-7)
+4. Rate Limiting — Upstash (Day 8-9)
+
+### Deferred
+- ~~Email Capture Security~~ → Phase 2
+- ~~Soft Delete~~ → Phase 1.5 (confirmation dialogs as interim)
 
 ---
 

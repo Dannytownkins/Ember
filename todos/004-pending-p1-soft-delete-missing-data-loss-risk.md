@@ -1,9 +1,12 @@
 ---
-status: pending
+status: deferred
 priority: p1
 issue_id: "004"
-tags: [code-review, database, data-integrity, data-loss, gdpr]
+tags: [code-review, database, data-integrity, data-loss, gdpr, deferred-phase-1.5]
 dependencies: []
+deferred_to: "Phase 1.5 (within 2 weeks post-launch)"
+deferred_reason: "Low user count at launch = low risk. Strong confirmation dialogs for now. Implement soft delete within 2 weeks of launch."
+deferred_date: "2026-02-10"
 ---
 
 # Problem Statement

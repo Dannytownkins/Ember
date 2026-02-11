@@ -251,12 +251,9 @@ export async function GET() {
 
 ## Recommended Action
 
-**Choose Solution 1 or 2 depending on preference:**
+**DECIDED: Solution 2 — Inngest** (2026-02-10)
 
-**If you want maximum control**: BullMQ + Upstash Redis (Solution 1)
-**If you want simplicity**: Inngest (Solution 2)
-
-Both solutions solve the timeout problem. Inngest is faster to implement, BullMQ is more customizable.
+Rationale: 4 hours vs 2 days. Managed retries + observability. $20/mo is nothing if Ember works. Not a devops person — let Inngest handle infrastructure.
 
 **DO NOT ship with `after()` for production.** It WILL fail on multi-screenshot captures.
 

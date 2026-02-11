@@ -1,9 +1,12 @@
 ---
-status: pending
+status: deferred
 priority: p1
 issue_id: "002"
-tags: [code-review, security, email, authentication, vulnerability]
+tags: [code-review, security, email, authentication, vulnerability, deferred-phase-2]
 dependencies: []
+deferred_to: "Phase 2"
+deferred_reason: "Email capture not in MVP scope. Paste + screenshot sufficient for validation. No users have asked for email capture yet."
+deferred_date: "2026-02-10"
 ---
 
 # Problem Statement
