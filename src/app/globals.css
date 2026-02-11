@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  /* Core palette */
+  --color-ember-bg: #0f0f11;
+  --color-ember-surface: #18181b;
+  --color-ember-surface-raised: #1f1f23;
+  --color-ember-surface-hover: #27272a;
+  --color-ember-border: #2e2e33;
+  --color-ember-border-subtle: #232328;
+
+  /* Amber warmth spectrum */
+  --color-ember-amber-50: #fefce8;
+  --color-ember-amber-100: #fef3c7;
+  --color-ember-amber-200: #fde68a;
+  --color-ember-amber-300: #fcd34d;
+  --color-ember-amber-400: #fbbf24;
+  --color-ember-amber: #f59e0b;
+  --color-ember-amber-600: #d97706;
+  --color-ember-amber-700: #b45309;
+  --color-ember-amber-800: #92400e;
+  --color-ember-amber-900: #78350f;
+
+  /* Ember red (accent, sparingly) */
+  --color-ember-red: #dc2626;
+  --color-ember-red-soft: #fca5a5;
+
+  /* Text hierarchy */
+  --color-ember-text: #fafafa;
+  --color-ember-text-secondary: #a1a1aa;
+  --color-ember-text-muted: #71717a;
+  --color-ember-text-warm: #fde68a;
+
+  /* Semantic */
+  --color-ember-success: #34d399;
+  --color-ember-warning: #fbbf24;
+  --color-ember-error: #f87171;
+
+  /* Glow shadows */
+  --shadow-ember-glow-sm: 0 0 8px 0 rgba(245, 158, 11, 0.08);
+  --shadow-ember-glow: 0 0 16px 0 rgba(245, 158, 11, 0.12);
+  --shadow-ember-glow-lg: 0 0 32px 0 rgba(245, 158, 11, 0.16);
+  --shadow-ember-glow-xl: 0 0 48px 0 rgba(245, 158, 11, 0.2);
+
+  /* Card shadows */
+  --shadow-ember-card: 0 1px 3px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(245, 158, 11, 0.04);
+  --shadow-ember-card-hover: 0 4px 16px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(245, 158, 11, 0.1);
+
+  /* Font families */
+  --font-display: "Fraunces", serif;
+  --font-body: "Source Sans 3", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px 0 rgba(245, 158, 11, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 20px 2px rgba(245, 158, 11, 0.3);
+  }
+}
+
+@keyframes ember-breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-ember-bg);
+  color: var(--color-ember-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
