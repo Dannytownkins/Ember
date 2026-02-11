@@ -3,7 +3,7 @@ import { validateBearerToken, requireScope } from "@/lib/api/auth";
 import { apiPaginated, apiError } from "@/lib/api/response";
 import { db } from "@/lib/db";
 import { memories, profiles } from "@/lib/db/schema";
-import { eq, and, lt, desc, inArray } from "drizzle-orm";
+import { eq, and, lt, desc, isNull } from "drizzle-orm";
 import { checkApiLimit } from "@/lib/rate-limit";
 import { memoriesQuerySchema } from "@/lib/validators/schemas";
 
@@ -56,8 +56,11 @@ export async function GET(request: NextRequest) {
     return apiError("NOT_FOUND", "Profile not found", 404);
   }
 
-  // Build query conditions
-  const conditions = [eq(memories.profileId, profileId)];
+  // Build query conditions (exclude soft-deleted)
+  const conditions = [
+    eq(memories.profileId, profileId),
+    isNull(memories.deletedAt),
+  ];
 
   if (category) {
     conditions.push(eq(memories.category, category));

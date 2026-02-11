@@ -3,13 +3,13 @@ import { validateBearerToken, requireScope } from "@/lib/api/auth";
 import { apiSuccess, apiError } from "@/lib/api/response";
 import { db } from "@/lib/db";
 import { memories, profiles } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { checkApiLimit } from "@/lib/rate-limit";
 import { updateMemorySchema } from "@/lib/validators/schemas";
 
 async function verifyMemoryOwnership(memoryId: string, userId: string) {
   const memory = await db.query.memories.findFirst({
-    where: eq(memories.id, memoryId),
+    where: and(eq(memories.id, memoryId), isNull(memories.deletedAt)),
     with: { profile: true },
   });
 
@@ -122,7 +122,11 @@ export async function DELETE(
     return apiError("NOT_FOUND", "Memory not found", 404);
   }
 
-  await db.delete(memories).where(eq(memories.id, id));
+  // Soft delete — set deletedAt, don't permanently remove
+  await db
+    .update(memories)
+    .set({ deletedAt: new Date() })
+    .where(eq(memories.id, id));
 
-  return apiSuccess({ id, deleted: true }, { rateLimit });
+  return apiSuccess({ id, deleted: true, restorable: true }, { rateLimit });
 }

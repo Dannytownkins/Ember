@@ -29,6 +29,7 @@ export const users = pgTable(
       .notNull()
       .default(false),
     tokenBudget: integer("token_budget").notNull().default(8000),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -62,6 +63,7 @@ export const profiles = pgTable(
     name: text("name").notNull(),
     platform: text("platform"),
     isDefault: boolean("is_default").notNull().default(false),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -103,6 +105,7 @@ export const captures = pgTable(
     rawText: text("raw_text"),
     imageUrls: jsonb("image_urls").$type<string[]>(),
     platform: text("platform"),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -150,7 +153,9 @@ export const memories = pgTable(
     importance: integer("importance").notNull(),
     verbatimTokens: integer("verbatim_tokens").notNull(),
     summaryTokens: integer("summary_tokens"),
+    contentHash: text("content_hash"),
     speakerConfidence: real("speaker_confidence"),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -170,6 +175,9 @@ export const memories = pgTable(
       table.importance
     ),
     index("idx_memories_capture").on(table.captureId),
+    index("idx_memories_content_hash")
+      .on(table.contentHash)
+      .where(sql`${table.contentHash} IS NOT NULL`),
     check("importance_range", sql`${table.importance} >= 1 AND ${table.importance} <= 5`),
   ]
 );

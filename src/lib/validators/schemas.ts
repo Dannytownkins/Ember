@@ -42,6 +42,21 @@ export const createCaptureSchema = z.object({
 
 export type CreateCaptureInput = z.infer<typeof createCaptureSchema>;
 
+// ─── Screenshot Capture Input ────────────────────────────
+
+export const createScreenshotCaptureSchema = z.object({
+  profileId: z.string().uuid(),
+  imageUrls: z
+    .array(z.string().url("Must be a valid URL"))
+    .min(1, "At least one screenshot required")
+    .max(10, "Maximum 10 screenshots per capture"),
+  platform: z.enum(["chatgpt", "claude", "gemini", "other"]).optional(),
+});
+
+export type CreateScreenshotCaptureInput = z.infer<
+  typeof createScreenshotCaptureSchema
+>;
+
 // ─── API Capture Input ───────────────────────────────────
 
 export const apiCreateCaptureSchema = z.object({

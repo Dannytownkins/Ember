@@ -1,8 +1,9 @@
 import { inngest } from "../client";
 import { db } from "@/lib/db";
 import { captures, memories } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { extractMemories, countTokens } from "@/lib/ai/extraction";
+import { eq, and, isNull } from "drizzle-orm";
+import { extractMemories, extractMemoriesFromImage, countTokens } from "@/lib/ai/extraction";
+import { generateContentHash } from "@/lib/utils/content-hash";
 
 export const processCapture = inngest.createFunction(
   {
@@ -38,45 +39,76 @@ export const processCapture = inngest.createFunction(
       return result[0];
     });
 
-    // Step 2: Extract memories via Claude
+    // Step 2: Extract memories via Claude (text or screenshot)
     const extracted = await step.run("extract", async () => {
-      if (!capture.rawText) {
-        throw new Error("Capture has no raw text to process");
+      if (capture.method === "screenshot" && capture.imageUrls?.length) {
+        // Screenshot capture — use vision
+        return (await extractMemoriesFromImage(capture.imageUrls)).memories;
       }
 
-      const result = await extractMemories(capture.rawText);
-      return result.memories;
+      if (!capture.rawText) {
+        throw new Error("Capture has no raw text or images to process");
+      }
+
+      return (await extractMemories(capture.rawText)).memories;
     });
 
-    // Step 3: Count tokens and save memories
-    await step.run("save", async () => {
-      const memoryRows = extracted.map((m) => ({
-        profileId: capture.profileId,
-        captureId: capture.id,
-        category: m.category as
-          | "emotional"
-          | "work"
-          | "hobbies"
-          | "relationships"
-          | "preferences",
-        factualContent: m.factualContent,
-        emotionalSignificance: m.emotionalSignificance,
-        verbatimText: m.verbatimText,
-        useVerbatim: true,
-        importance: m.importance,
-        verbatimTokens: countTokens(m.verbatimText),
-        summaryTokens: null,
-        speakerConfidence: null,
-      }));
+    // Step 3: Deduplicate, count tokens, and save memories
+    const result = await step.run("save", async () => {
+      let saved = 0;
+      let skippedDuplicates = 0;
 
-      await db.insert(memories).values(memoryRows);
+      for (const m of extracted) {
+        const contentHash = generateContentHash(m.factualContent, m.category);
+
+        // Check for duplicate
+        const existing = await db.query.memories.findFirst({
+          where: and(
+            eq(memories.profileId, capture.profileId),
+            eq(memories.contentHash, contentHash),
+            isNull(memories.deletedAt)
+          ),
+          columns: { id: true },
+        });
+
+        if (existing) {
+          skippedDuplicates++;
+          continue;
+        }
+
+        await db.insert(memories).values({
+          profileId: capture.profileId,
+          captureId: capture.id,
+          category: m.category as
+            | "emotional"
+            | "work"
+            | "hobbies"
+            | "relationships"
+            | "preferences",
+          factualContent: m.factualContent,
+          emotionalSignificance: m.emotionalSignificance,
+          verbatimText: m.verbatimText,
+          useVerbatim: true,
+          importance: m.importance,
+          verbatimTokens: countTokens(m.verbatimText),
+          summaryTokens: null,
+          contentHash,
+          speakerConfidence: null,
+        });
+        saved++;
+      }
 
       await db
         .update(captures)
         .set({ status: "completed" })
         .where(eq(captures.id, captureId));
+
+      return { saved, skippedDuplicates };
     });
 
-    return { memoryCount: extracted.length };
+    return {
+      memoryCount: result.saved,
+      duplicatesSkipped: result.skippedDuplicates,
+    };
   }
 );
