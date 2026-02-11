@@ -35,6 +35,12 @@ export function WakePromptGenerator({
     prompt: string;
     tokenCount: number;
     memoryCount: number;
+    overflow?: {
+      totalAvailable: number;
+      totalIncluded: number;
+      droppedCount: number;
+      oversizedMemories: number;
+    };
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -138,10 +144,26 @@ export function WakePromptGenerator({
       {/* Result preview */}
       {result && (
         <div className="space-y-3">
+          {/* Overflow warning */}
+          {result.overflow && result.overflow.droppedCount > 0 && (
+            <div className="rounded-xl border border-ember-warning/20 bg-ember-warning/5 px-4 py-3 text-sm text-ember-warning">
+              ⚠️ {result.overflow.droppedCount} memor{result.overflow.droppedCount === 1 ? "y" : "ies"} excluded to fit within token budget.
+              Showing {result.overflow.totalIncluded} of {result.overflow.totalAvailable} available.
+              {result.overflow.oversizedMemories > 0 && (
+                <> ({result.overflow.oversizedMemories} truncated for size.)</>
+              )}
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <span className="text-sm text-ember-text-secondary">
               {result.tokenCount.toLocaleString()} tokens &middot;{" "}
               {result.memoryCount} memories
+              {result.overflow && result.overflow.totalAvailable > result.memoryCount && (
+                <span className="text-ember-text-muted">
+                  {" "}/ {result.overflow.totalAvailable} total
+                </span>
+              )}
             </span>
             <button
               onClick={handleCopy}

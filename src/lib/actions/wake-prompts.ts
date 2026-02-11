@@ -18,6 +18,13 @@ interface WakePromptResult {
   tokenCount: number;
   memoryCount: number;
   categories: MemoryCategory[];
+  overflow: {
+    totalAvailable: number;
+    totalIncluded: number;
+    droppedCount: number;
+    oversizedMemories: number;
+    perCategory: Record<string, { available: number; included: number; dropped: number }>;
+  };
 }
 
 export async function generateWakePromptAction(

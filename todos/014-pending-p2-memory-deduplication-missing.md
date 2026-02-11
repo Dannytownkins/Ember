@@ -1,6 +1,8 @@
 ---
-status: pending
+status: done
 priority: p2
+completed_at: 2026-02-11
+completed_by: Vera
 issue_id: "014"
 tags: [code-review, data-integrity, deduplication, quality]
 dependencies: []
