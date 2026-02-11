@@ -4,6 +4,7 @@ import { type WebhookEvent } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { users, profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { softDeleteUser } from "@/lib/db/soft-delete";
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -11,6 +12,7 @@ export async function POST(req: Request) {
     throw new Error("Missing CLERK_WEBHOOK_SECRET");
   }
 
+  // Verify Svix signature
   const headerPayload = await headers();
   const svixId = headerPayload.get("svix-id");
   const svixTimestamp = headerPayload.get("svix-timestamp");
@@ -33,46 +35,80 @@ export async function POST(req: Request) {
       "svix-signature": svixSignature,
     }) as WebhookEvent;
   } catch {
+    console.error("Webhook signature verification failed");
     return new Response("Invalid signature", { status: 400 });
   }
 
-  if (evt.type === "user.created") {
-    const { id, email_addresses } = evt.data;
-    const primaryEmail = email_addresses[0]?.email_address;
+  try {
+    if (evt.type === "user.created") {
+      const { id, email_addresses } = evt.data;
+      const primaryEmail = email_addresses[0]?.email_address;
 
-    if (!primaryEmail) {
-      return new Response("No email found", { status: 400 });
-    }
+      if (!primaryEmail) {
+        console.error(`Clerk webhook: user ${id} has no email`);
+        return new Response("No email found", { status: 400 });
+      }
 
-    // Idempotency: skip if user already exists
-    const existing = await db.query.users.findFirst({
-      where: eq(users.clerkId, id),
-    });
-
-    if (!existing) {
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          clerkId: id,
-          email: primaryEmail,
-        })
-        .returning();
-
-      // Create default profile
-      await db.insert(profiles).values({
-        userId: newUser.id,
-        name: "Default",
-        isDefault: true,
+      // Idempotency: skip if user already exists
+      const existing = await db.query.users.findFirst({
+        where: eq(users.clerkId, id),
       });
-    }
-  }
 
-  if (evt.type === "user.deleted") {
-    const { id } = evt.data;
-    if (id) {
-      // CASCADE handles children (profiles, captures, memories, api_tokens)
-      await db.delete(users).where(eq(users.clerkId, id));
+      if (!existing) {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            clerkId: id,
+            email: primaryEmail,
+          })
+          .returning();
+
+        // Create default profile
+        await db.insert(profiles).values({
+          userId: newUser.id,
+          name: "Default",
+          isDefault: true,
+        });
+
+        console.log(`Created user ${newUser.id} from Clerk webhook`);
+      } else {
+        console.log(`User ${existing.id} already exists (idempotent skip)`);
+      }
     }
+
+    if (evt.type === "user.deleted") {
+      const { id } = evt.data;
+      if (id) {
+        // Find the user
+        const user = await db.query.users.findFirst({
+          where: eq(users.clerkId, id),
+        });
+
+        if (user) {
+          // Soft delete instead of hard delete — 30-day recovery window
+          await softDeleteUser(user.id);
+          console.log(`Soft-deleted user ${user.id} from Clerk webhook`);
+        } else {
+          console.log(`User with clerkId ${id} not found (idempotent skip)`);
+        }
+      }
+    }
+
+    // Handle email updates
+    if (evt.type === "user.updated") {
+      const { id, email_addresses } = evt.data;
+      const primaryEmail = email_addresses[0]?.email_address;
+
+      if (primaryEmail) {
+        await db
+          .update(users)
+          .set({ email: primaryEmail })
+          .where(eq(users.clerkId, id));
+      }
+    }
+  } catch (error) {
+    console.error(`Webhook processing error for ${evt.type}:`, error);
+    return new Response("Processing error", { status: 500 });
   }
 
   return new Response("OK", { status: 200 });
