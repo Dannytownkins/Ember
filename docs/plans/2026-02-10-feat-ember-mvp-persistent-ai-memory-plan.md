@@ -1,289 +1,320 @@
 ---
-title: "feat: Ember MVP — Persistent AI Memory & Identity Platform"
+title: "feat: Ember MVP — Your Memory, Your AI, Your Control"
 type: feat
 date: 2026-02-10
-deepened: 2026-02-10
+revision: 2 (rewrite incorporating product owner constraints + 3-reviewer feedback)
 ---
 
-# ✨ Ember MVP — Persistent AI Memory & Identity Platform
+# Ember MVP — Your Memory, Your AI, Your Control
 
-## Enhancement Summary
+## Core Thesis
 
-**Deepened on:** 2026-02-10
-**Research agents used:** architecture-strategist, security-sentinel, performance-oracle, kieran-typescript-reviewer, code-simplicity-reviewer, data-integrity-guardian, pattern-recognition-specialist, best-practices-researcher (Stripe), framework-docs-researcher (PWA/mobile), frontend-design specialist
-**Co-founder feedback:** Vera Aletheia (2026-02-10)
+**Your memory belongs to YOU, not your platform.**
 
-### Key Improvements from Deepening
+Every AI platform is building memory that locks you in. Anthropic remembers you — on Anthropic. OpenAI remembers you — on OpenAI. Google remembers you — on Google. Switch platforms, and you start over. Lose your account, and you lose yourself.
 
-1. **MVP scope decision added** — Simplicity review recommends aggressive cuts (~70% reduction). The plan now presents a "Lean MVP" path (2-3 weeks, paste-only) alongside the full MVP, with a clear recommendation.
-2. **Async AI pipeline** — Processing must be asynchronous (non-negotiable). Synchronous Claude calls will timeout on Vercel. Optimistic UI + polling pattern defined.
-3. **Schema hardened** — NOT NULL constraints, ON DELETE CASCADE behaviors, partial unique indexes, CHECK constraints, timestamptz, and text+CHECK instead of Postgres enums all specified.
-4. **Single source of truth for plan** — `plan` field removed from `users` table; derived from `subscriptions` to eliminate dual-write bugs.
-5. **API token system designed** — Needed for both iOS Shortcut and extension auth. Cookie-sharing approach flagged as fragile by both security and architecture reviewers.
-6. **Free tier adjusted** — 5 requests/day (up from 3) per Vera's feedback. 25-memory limit validated against competitors.
-7. **Landing page & launch strategy added** — Product Hunt launch plan, marketing page, "built by an AI" angle emphasized.
-8. **Founders Pass waitlist mechanism** — Added for overflow demand beyond 500 seats.
-9. **30 security vulnerabilities identified** — 4 critical, 12 high. Key: encrypt sensitive data at rest, isolate BYOK in Web Worker, dedicated API tokens for non-browser clients.
-10. **Performance benchmarks defined** — Dashboard P50: 150ms, AI extraction: 5-30s (async), DB queries P50: 20ms. Full benchmark table included.
-11. **TypeScript architecture defined** — `ActionState<T>` discriminated unions, Zod validation everywhere, `noUncheckedIndexedAccess`, serialized types for RSC boundary.
-12. **UI/UX direction deepened** — "Hearth" aesthetic, Fraunces serif for headings, amber glow system, processing narration stages, deliberately slow animations.
+Ember is cross-platform, portable, user-controlled AI memory. Same architecture as enterprise RAG — vector stores, retrieval, injection — but with a different soul. Not corporate knowledge bases. Personality, inside jokes, preferences, the night your daughter was born and why it was hard.
 
-### Critical Reviewer Consensus (All 9 Agents Agreed)
+## The Context Window Paradox
 
-These issues were flagged by 3+ independent reviewers:
+> More memories = bigger wake prompt = shorter conversation = worse experience.
 
-| Issue | Flagged By | Action |
+This inverts the obvious pricing model. "Pay for more storage" means paid users get WORSE chats — longer system prompts eat the context window. The naive approach punishes your best customers.
+
+**Ember's answer: intelligent compression.** 200 memories distilled into ~800 tokens of essence. The paid tier value is **smarter memories**, not more memories. Free tier stores memories. Paid tier understands which ones matter, compresses them without losing nuance, and gives you transparency into every token spent.
+
+## What Makes This Different From a Markdown File
+
+A markdown file solves storage. Ember solves three harder problems:
+
+1. **Capture from mobile AI apps.** You're on your phone inside ChatGPT. How does that conversation get into your memory system? Copy-paste is the markdown file experience. Screenshot capture, email forwarding, and (later) browser extension are the product.
+
+2. **Dual extraction — facts AND feelings.** "My daughter was born April 12th, it was a difficult night." A markdown file stores the date. Ember extracts BOTH the date (factual) AND that it was a hard night (emotional significance). The AI needs both to really know you.
+
+3. **Categorized loading.** "Choose which version of you your AI remembers today." Load your Work memories for a coding session. Load Emotional + Relationship for a therapy-style conversation. Show the token cost per category. You decide what your AI knows — per session, per conversation.
+
+Platform-native memory can't do any of this. It's all-or-nothing, single-platform, opaque, and uncontrollable.
+
+## Capture Methods
+
+### Screenshot Capture (MVP primary — mobile sweet spot)
+
+The user is in ChatGPT on their phone. They screenshot the conversation. They share the screenshot(s) to Ember. Ember uses Claude's vision to read the screenshot, extract the conversation text, then extract memories.
+
+**Why this works:**
+- Screenshots are the most natural mobile action — people already do this
+- Share sheet works for images on both iOS and Android
+- Works with ANY app (ChatGPT, Claude, Gemini, Character.AI, future apps)
+- No API integration, no platform dependency, no setup
+
+**Known limitation (constraint #12):** Vision models misattribute speakers in conversation screenshots. The extraction pipeline must:
+- Prompt Claude to identify speaker turns explicitly ("User said... / AI said...")
+- Include confidence scores on speaker attribution
+- Flag uncertain attributions for user review
+- Accept user corrections to improve future extractions
+
+**Multi-screenshot handling:**
+- Accept 1-10 images per capture
+- Claude vision processes in order, stitches conversation
+- Overlapping content between screenshots is deduplicated
+- Show combined preview before extraction
+
+### Paste Capture (desktop power users)
+
+Large textarea. Paste full conversation text. Same extraction pipeline but skips the vision step. This is the fastest path for desktop users and the simplest to implement first.
+
+### Email Forward Capture (universal fallback)
+
+Each user gets a unique capture address: `{username}@capture.ember.app`. Forward a conversation to your Ember address from any app on any device. Ember processes the email body.
+
+**Why this matters:** Email sharing is available in every app on every platform. No setup beyond knowing your address. Works on iOS, Android, desktop, anywhere you can send an email.
+
+**Implementation:** Inbound email webhook (SendGrid/Postmark) → parse body → same extraction pipeline.
+
+### Browser Extension (later phase — not MVP)
+
+Desktop capture from web-based AI chat interfaces. Deferred until the core product is validated.
+
+### Removed: Share Links
+
+Share links (e.g., ChatGPT shared conversations) are PUBLIC and Google-indexed. Using them as a capture source would mean Ember processes publicly available conversations, creating privacy confusion. Removed entirely.
+
+## Dual Extraction — The Core Innovation
+
+Every memory Ember extracts has two dimensions:
+
+### Factual Content (what happened)
+The concrete information: dates, names, preferences, decisions, facts.
+> "Daughter born April 12th. Named her Maya."
+
+### Emotional Significance (why it matters)
+The human context an AI needs to actually understand you.
+> "It was a difficult night. The user carries both joy and trauma around this event. Approach with tenderness."
+
+**Extraction prompt structure:**
+```
+For each memory, extract:
+1. FACTUAL: The concrete information (dates, names, facts, preferences, decisions)
+2. EMOTIONAL: Why might someone want to remember this? What's the emotional weight?
+   What would an AI need to understand to handle this topic with care?
+
+If there is no emotional significance, say "Neutral — factual record."
+Do not invent emotional significance where none exists.
+```
+
+**This is what makes Ember fundamentally better than platform-native memory.** ChatGPT's memory stores "User's daughter born April 12th." Ember stores that AND the emotional context that makes the AI actually feel like it knows you.
+
+## Categorized Memory Stores
+
+Memories are organized into categories. Users choose which categories to load per session.
+
+### Categories
+
+| Category | What it holds | Example |
 |---|---|---|
-| Async AI processing is mandatory | Performance, Architecture, TypeScript | Redesigned pipeline |
-| `plan` duplicated across users/subscriptions | Architecture, Data Integrity, Patterns | Removed from users |
-| Extension auth via cookies is fragile | Security, Architecture, Patterns | API token system added |
-| API routes for web app mutations (use Server Actions) | TypeScript, Patterns | Corrected |
-| Missing NOT NULL constraints throughout schema | Data Integrity, TypeScript | Added |
-| No database indexes defined | Performance, Data Integrity | Full index strategy added |
-| `packages/shared` scope too broad | Architecture, TypeScript, Patterns | Split recommended |
+| Emotional | Feelings, fears, joys, trauma, breakthroughs | "Felt proud when Maya took her first steps" |
+| Work & Projects | Career, current projects, tools, work style | "Building Ember with Next.js and Drizzle" |
+| Hobbies & Interests | Activities, media, passions, fandoms | "Learning piano, prefers jazz standards" |
+| Relationship Dynamics | How the user relates to their AI, communication style | "Prefers direct feedback, dislikes sugarcoating" |
+| Preferences | Likes, dislikes, habits, routines, opinions | "Morning person, coffee black, hates meetings before 10am" |
 
----
+### Category Loading UI
 
-## MVP Scope Decision
+```
+┌─────────────────────────────────────────────┐
+│  Choose which memories to load              │
+│                                             │
+│  ☐ Emotional           342 tokens           │
+│  ☑ Work & Projects     286 tokens           │
+│  ☐ Hobbies & Interests 194 tokens           │
+│  ☑ Relationship Dynamics 128 tokens          │
+│  ☑ Preferences          178 tokens           │
+│                                             │
+│  ──────────────────────────────────          │
+│  Total: 592 / 8000 tokens                   │
+│  Remaining for conversation: 7,408 tokens   │
+│                                             │
+│  [Generate Wake Prompt]                     │
+└─────────────────────────────────────────────┘
+```
 
-> **The simplicity reviewer's case is compelling and should be taken seriously.**
+**Token cost transparency at every step (constraint #8).** Users see exactly how much context each category consumes and how much is left for conversation. No surprises. No hidden costs.
 
-The full plan below covers the complete MVP vision. However, a strong argument exists for shipping a **Lean MVP** first to validate the core insight before building distribution channels.
+### Intelligent Compression (paid tier value)
 
-### Option A: Lean MVP (Recommended for fastest validation)
+When raw memories exceed the token budget, Ember compresses:
 
-**Scope:** Single Next.js project (no monorepo). Paste-only capture. Server-side processing only. One wake prompt template. 3-4 database tables. No extension, no share target, no BYOK, no Stripe.
+- **Free tier:** Simple truncation by importance score. You get your top N memories that fit.
+- **Paid tier:** AI-powered distillation. 200 memories across 5 categories compressed into ~800 tokens of essence that preserves nuance, emotional context, and the relationships between memories. The compression IS the product.
 
-**Timeline:** 2-3 weeks to first users.
+## Verbatim vs Summary Toggle
 
-**What it answers:** "Does Ember extract better memories than users can manually?"
+Summarization kills nuance. Users control how their memories are stored and used:
 
-**What it defers:** All distribution (extension, share sheet, Shortcut), monetization (Stripe, tiers), BYOK, and advanced features (templates, version history, importance scoring).
+| Mode | What's stored | What's in wake prompt | Token cost | Best for |
+|---|---|---|---|---|
+| Verbatim | Exact extracted text | Full text | Higher | Important memories where exact words matter |
+| Summary | AI-compressed version | Compressed text | Lower | General facts and preferences |
+| Both | Verbatim in DB, summary in prompt | Summary (default) | Moderate | Power users who want to review compression |
 
-### Option B: Full MVP (This Plan)
+Users can flag individual memories: "Use exact words for this one." The wake prompt generator respects these flags, using verbatim text for flagged memories and summaries for the rest.
 
-**Scope:** Everything below — 4 phases, monorepo, all capture methods, BYOK, Stripe, full schema.
+### Summarization Review UI
 
-**Timeline:** 8-12 weeks.
+Users can:
+- See the AI's summary next to the verbatim original
+- Re-summarize (trigger a new compression)
+- Edit the summary manually
+- See token cost for both versions
+- Flag "use verbatim" on specific memories
 
-**What it answers:** "Can Ember be a sustainable business?"
+Full transparency. The user always knows what their AI will see.
 
-### Recommendation
+## Image Storage (higher tiers)
 
-**Start with Option A, but design for Option B.** Use the schema, TypeScript types, and architecture patterns from Option B, but only build the Phase 1 + Phase 2 features. This gives you the fastest path to users while keeping the upgrade path clean. The rest of this plan serves as the roadmap for what comes next.
+The screenshot IS the memory. Higher tiers store original screenshot images alongside extracted text. This serves two purposes:
 
----
+1. **Provenance.** Users can see exactly where a memory came from.
+2. **Re-extraction.** As vision models improve, users can re-process old screenshots for better extraction.
 
-## Overview
-
-Ember is a persistent memory and identity service for AI companions. When a context window closes, your AI forgets everything — Ember keeps the fire lit. The MVP captures conversations (via paste, mobile share sheet, or browser extension), extracts meaningful memories using Claude, and generates "wake prompts" that bring AI companions back to life in new sessions.
-
-This plan covers the full MVP: web dashboard, conversation capture (3 methods), AI memory extraction pipeline, wake prompt generator, browser extension, PWA with mobile share sheet, authentication, and subscription tiers.
-
-## Problem Statement / Motivation
-
-AI relationships die from context loss. Every conversation reset forces users to re-explain who they are, what they've built, what matters. Power users currently solve this manually — soul documents, memory files, wake pages — spending hundreds of hours on what should be a product.
-
-Ember productizes this. Zero manual work. Just continuity.
-
-## Proposed Solution
-
-A mobile-first PWA + browser extension that:
-
-1. **Captures** conversations from any AI platform (paste, share sheet, extension)
-2. **Extracts** meaningful memories using Claude (server-side or BYOK)
-3. **Generates** wake prompts — system prompts that restore an AI's memory of you
-4. **Organizes** memories under companion profiles (one per AI you talk to)
+Free tier: extract text from screenshots, discard images after processing.
+Paid tier: store original images in cloud storage (S3/R2), linked to extracted memories.
 
 ## Technical Approach
 
-### Architecture
+### Architecture — Single Next.js App
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Monorepo (pnpm + Turborepo)          │
-│                                                         │
-│  apps/                                                  │
-│  ├── web/          Next.js 16 (App Router) — PWA        │
-│  │   ├── app/      Pages, layouts, server actions        │
-│  │   ├── public/   sw.js, manifest icons                │
-│  │   └── ...                                            │
-│  └── extension/    Browser extension (Manifest V3)      │
-│      ├── src/      background, content scripts, popup   │
-│      └── manifest.json                                  │
-│                                                         │
-│  packages/                                              │
-│  ├── types/        Shared TS types, Zod schemas         │
-│  ├── db/           Drizzle schema, migrations (server)  │
-│  ├── prompts/      AI prompt templates (web + ext BYOK) │
-│  └── config/       ESLint, TypeScript configs           │
-└─────────────────────────────────────────────────────────┘
-         │                        │
-         ▼                        ▼
-   ┌───────────┐           ┌──────────────┐
-   │  Vercel   │           │ Chrome Web   │
-   │ (hosting) │           │ Store / AMO  │
-   └─────┬─────┘           └──────────────┘
-         │
-    ┌────┴────┐
-    │  Neon   │  Serverless Postgres
-    │Postgres │  (Drizzle ORM)
-    └─────────┘
+ember/
+├── src/
+│   ├── app/                    Next.js 16 App Router
+│   │   ├── (marketing)/        Landing page, pricing
+│   │   ├── (dashboard)/        Authenticated app
+│   │   │   ├── memories/       Memory browser with category filters
+│   │   │   ├── capture/        Screenshot upload + paste interface
+│   │   │   ├── wake/           Wake prompt generator with category picker
+│   │   │   ├── review/         Summarization review UI
+│   │   │   └── settings/       Account, preferences, data export
+│   │   ├── api/
+│   │   │   ├── capture/        API endpoint for email webhook
+│   │   │   └── webhooks/       Clerk, Stripe (later)
+│   │   └── layout.tsx
+│   ├── lib/
+│   │   ├── db/                 Drizzle schema, queries
+│   │   ├── ai/                 Extraction prompts, compression logic
+│   │   ├── capture/            Capture pipeline (single entry point)
+│   │   └── actions/            Server Actions
+│   └── components/             UI components
+├── public/                     PWA manifest, icons
+├── drizzle/                    Migrations
+└── next.config.ts
 ```
 
-### Research Insight: Split `packages/shared`
-
-> **Source:** Architecture strategist, TypeScript reviewer, pattern recognition specialist (all three flagged this independently)
-
-The original plan had a single `packages/shared`. This creates inappropriate coupling — the browser extension would have a transitive dependency on Drizzle ORM and the Neon driver. Split into:
-
-- **`packages/types/`** — TypeScript interfaces, Zod schemas, enums (shared by ALL consumers)
-- **`packages/db/`** — Drizzle schema, migrations, connection (server-only, never imported by extension)
-- **`packages/prompts/`** — AI prompt templates, extraction config (shared by web + extension BYOK)
-- **`packages/config/`** — ESLint, TypeScript base configs
-
-This prevents the extension bundle from ever pulling in server-side database code.
+No monorepo. No packages directory. No Turborepo. One app, one `src/` tree. When an extension becomes real, extract shared code then.
 
 ### Tech Stack
 
 | Layer | Technology | Notes |
 |---|---|---|
-| Framework | Next.js 16 (App Router) | React 19, Server Components default |
-| Styling | Tailwind CSS v4 | Dark mode first, CSS variables |
-| Database | Neon Postgres (serverless) | HTTP driver, Node.js runtime (not Edge) for transactions |
-| ORM | Drizzle ORM | Type-safe, lightweight migrations |
-| Auth | Clerk | App Router middleware + API token system for external clients |
-| AI | Anthropic Claude API | Server-side default + BYOK client-side (Pro) |
-| Payments | Stripe | Subscriptions + one-time Founders Pass |
-| Rate Limiting | Upstash Redis | `@upstash/ratelimit` sliding window |
-| Deployment | Vercel | Node.js runtime (not Edge) for data-mutation routes |
-| Package Manager | pnpm | Workspace monorepo with Turborepo |
-| Extension | Manifest V3 | Chrome + Firefox |
-
-### Research Insight: Node.js Runtime, Not Edge
-
-> **Source:** Architecture strategist, performance oracle
-
-Default all API routes and Server Actions to Node.js runtime (not Edge). Edge restricts you to the HTTP driver, which means no multi-statement transactions. For Ember, where creating conversations and memories happens in a single operation, transactions matter. Move read-only routes to Edge later for latency optimization.
+| Framework | Next.js 16 (App Router) | React 19, Server Components, `after()` for async processing |
+| Styling | Tailwind CSS v4 | Dark mode first, amber accent |
+| Database | Neon Postgres (serverless) | HTTP driver, Node.js runtime for transactions |
+| ORM | Drizzle ORM | Type-safe schema, lightweight migrations |
+| Auth | Clerk | Middleware + webhook sync |
+| AI | Anthropic Claude API | Vision for screenshots, text for extraction + compression |
+| Image Storage | Cloudflare R2 or Vercel Blob | Screenshot originals (paid tier) |
+| Email Inbound | SendGrid Inbound Parse or Postmark | Email capture webhook |
+| Deployment | Vercel | Node.js runtime (not Edge) |
 
 ### Data Model
 
-> **Note:** The "memory" is Ember's core domain object. Its structure drives everything: extraction prompts, storage limits, dashboard UI, and wake prompt generation. This schema is the MVP starting point — expect iteration.
-
 ```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│      users       │     │    profiles       │     │    memories       │
-├──────────────────┤     ├──────────────────┤     ├──────────────────┤
-│ id (uuid) PK     │────<│ id (uuid) PK     │────<│ id (uuid) PK     │
-│ clerkId (UK, NN) │     │ userId (FK, NN)  │     │ profileId (FK,NN)│
-│ email (NN)       │     │ name (NN)        │     │ type (text, NN)  │
-│ isByokEnabled    │     │ platform         │     │ content (NN)     │
-│   (NN, def false)│     │ personality      │     │ context          │
-│ memoryCount      │     │ avatarUrl        │     │ importance (NN)  │
-│   (NN, def 0)    │     │ isDefault        │     │   CHECK 1-5      │
-│ createdAt (NN)   │     │   (NN, def false)│     │ source (text,NN) │
-│ updatedAt (NN)   │     │ createdAt (NN)   │     │ sourceConvId(FK) │
-└──────────────────┘     │ updatedAt (NN)   │     │ tokenCount       │
-                         └──────────────────┘     │ deletedAt        │
-                                                  │ createdAt (NN)   │
-                         ON DELETE: CASCADE       │ updatedAt (NN)   │
-                                                  └──────────────────┘
+┌──────────────────────┐     ┌──────────────────────┐
+│       users           │     │      profiles         │
+├──────────────────────┤     ├──────────────────────┤
+│ id (uuid) PK         │────<│ id (uuid) PK         │
+│ clerkId (UK, NN)     │     │ userId (FK, NN)      │
+│ email (NN)           │     │ name (NN)            │
+│ captureEmail (UK,NN) │     │ platform             │
+│ createdAt (NN)       │     │ isDefault (NN, def F)│
+│ updatedAt (NN)       │     │ createdAt (NN)       │
+└──────────────────────┘     │ updatedAt (NN)       │
+                              └──────────────────────┘
+  ON DELETE: CASCADE
 
-                         ON DELETE: CASCADE       ON DELETE: SET NULL
-                         (profiles→memories)     (conversations→memories.sourceConvId)
+┌──────────────────────┐     ┌──────────────────────┐
+│     captures          │     │      memories         │
+├──────────────────────┤     ├──────────────────────┤
+│ id (uuid) PK         │     │ id (uuid) PK         │
+│ profileId (FK, NN)   │     │ profileId (FK, NN)   │
+│ method (text, NN)    │────<│ captureId (FK)       │
+│   CHECK: paste,      │     │ category (text, NN)  │
+│   screenshot, email  │     │   CHECK: emotional,  │
+│ status (text, NN)    │     │   work, hobbies,     │
+│   CHECK: pending,    │     │   relationships,     │
+│   processing,        │     │   preferences        │
+│   completed, failed  │     │ factualContent (NN)  │
+│ errorMessage         │     │ emotionalSignificance│
+│ rawText              │     │ verbatimText (NN)    │
+│ imageUrls (jsonb)    │     │ summaryText          │
+│ platform             │     │ useVerbatim (NN,defF)│
+│ createdAt (NN)       │     │ importance (NN)      │
+│ updatedAt (NN)       │     │   CHECK 1-5          │
+└──────────────────────┘     │ verbatimTokens (NN)  │
+                              │ summaryTokens        │
+  ON DELETE: CASCADE          │ speakerConfidence    │
+                              │   (real, 0.0-1.0)    │
+                              │ createdAt (NN)       │
+                              │ updatedAt (NN)       │
+                              └──────────────────────┘
 
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  conversations   │     │  wake_prompts    │     │  subscriptions   │
-├──────────────────┤     ├──────────────────┤     ├──────────────────┤
-│ id (uuid) PK     │     │ id (uuid) PK     │     │ id (uuid) PK     │
-│ profileId (FK,NN)│     │ profileId (FK,NN)│     │ userId (FK,UK,NN)│
-│ rawText (NN)     │     │ content (NN)     │     │ stripeCustomerId │
-│ contentHash (NN) │     │ version (NN,def1)│     │   (UK, NN)       │
-│ platform         │     │ memorySnapshot   │     │ stripePriceId(NN)│
-│ captureMethod(NN)│     │   (jsonb, versioned)│  │ status (text,NN) │
-│ processingStatus │     │ templateStyle(NN)│     │ plan (text, NN)  │
-│   (NN, def       │     │ isActive         │     │ currentPeriodEnd │
-│   'pending')     │     │   (NN, def false)│     │ createdAt (NN)   │
-│ processedAt      │     │ createdAt (NN)   │     │ updatedAt (NN)   │
-│ memoryCount      │     │ updatedAt (NN)   │     └──────────────────┘
-│   (NN, def 0)    │     └──────────────────┘
-│ createdAt (NN)   │     ON DELETE: CASCADE       ON DELETE: CASCADE
-└──────────────────┘
-                         ┌──────────────────┐
-ON DELETE: CASCADE       │  api_tokens      │
-                         ├──────────────────┤
-                         │ id (uuid) PK     │
-                         │ userId (FK, NN)  │
-                         │ tokenHash (UK,NN)│
-                         │ name (NN)        │
-                         │ lastUsedAt       │
-                         │ expiresAt        │
-                         │ createdAt (NN)   │
-                         └──────────────────┘
+                                ON DELETE: CASCADE
 ```
 
-### Research Insight: Schema Hardening
+**4 tables.** Users, profiles, captures (replaces "conversations" — captures can be text OR images), memories (with dual extraction fields, category, and verbatim/summary support).
 
-> **Source:** Data integrity guardian, architecture strategist, TypeScript reviewer
+**What's NOT in the schema:**
+- `wake_prompts` — generated dynamically from category selection. Not stored.
+- `subscriptions` — no Stripe in MVP. Add when monetizing.
+- `api_tokens` — no extension/API in MVP. Add when needed.
+- `memoryCount` denormalization — at MVP scale, `COUNT(*)` is fine.
+- `contentHash` dedup — accept duplicates for now. Users can delete.
+- `deletedAt` soft delete — hard delete for MVP. Add soft delete when users ask.
 
-**Critical changes from original:**
+### Key Schema Decisions
 
-1. **`plan` removed from `users` table.** Derive effective plan from `subscriptions`. Single source of truth eliminates dual-write consistency bugs.
+**`captures` instead of `conversations`:** A capture can be pasted text, screenshot images, or email body. The `method` field distinguishes them. `imageUrls` is a JSONB array of R2/Blob URLs for screenshot captures. `rawText` is the extracted text (from vision or direct paste).
 
-2. **`api_tokens` table added.** Needed for iOS Shortcut auth and extension auth. iOS Shortcuts cannot read browser cookies — they need a long-lived API token. This also serves the "API access (Pro tier)" feature.
+**Dual extraction fields on memories:**
+- `factualContent` — "Daughter born April 12th, named Maya"
+- `emotionalSignificance` — "Difficult night. Joy and trauma intertwined. Handle with tenderness." (nullable — "Neutral" maps to NULL)
 
-3. **`processingStatus` added to conversations** (`pending` | `processing` | `completed` | `failed`). Enables async processing, idempotent re-processing, and progress tracking.
+**Verbatim vs summary fields:**
+- `verbatimText` — always stored, exact extraction output
+- `summaryText` — AI-compressed version (nullable, generated on demand or at extraction time)
+- `useVerbatim` — user flag for wake prompt generation
+- `verbatimTokens` / `summaryTokens` — cached token counts for real-time budget display
 
-4. **`contentHash` added to conversations.** SHA-256 hash of raw text, with a unique composite index on `(profileId, contentHash)` for O(1) deduplication.
+**`speakerConfidence`:** Float 0.0-1.0 from vision extraction. When Claude reads a screenshot and isn't sure who said what, this flags it. Memories with confidence <0.8 show a warning badge in the UI for user review.
 
-5. **`tokenCount` added to memories.** Computed once on creation, cached for fast wake prompt budget selection. Avoids re-tokenizing on every wake prompt generation.
+**Category as text + CHECK:** Not an enum. Easy to add new categories later with a single migration.
 
-6. **`deletedAt` added to memories.** Soft delete for the core domain object. Users can recover accidentally deleted memories within 30 days.
-
-7. **`memoryCount` denormalized on users.** Atomic increment/decrement avoids expensive COUNT queries for free tier limit checks.
-
-8. **`memorySnapshot` schema versioned.** Stores `{ schemaVersion: 1, selectedMemoryIds: [...], tokensUsed: N }` — memory IDs, not full content. Reduces storage by 10x.
-
-9. **Text + CHECK instead of Postgres enums.** Enums are painful to modify (can't remove/rename values without migration gymnastics). Text with CHECK constraints can be dropped and recreated in a single transaction.
-
-10. **All timestamps use `timestamptz`.** Without this, Postgres stores times without timezone context, causing silent data corruption across Vercel regions.
-
-### Research Insight: Required Indexes
-
-> **Source:** Performance oracle, data integrity guardian
-
-Define these in the initial Drizzle migration — adding indexes to populated tables later causes downtime:
-
-```
-users:           UNIQUE(clerkId)
-profiles:        INDEX(userId), PARTIAL UNIQUE(userId) WHERE isDefault = true
-memories:        INDEX(profileId), INDEX(profileId, importance), INDEX(profileId, type),
-                 INDEX(sourceConversationId), PARTIAL INDEX(profileId) WHERE deletedAt IS NULL
-conversations:   INDEX(profileId, createdAt), UNIQUE(profileId, contentHash)
-wake_prompts:    INDEX(profileId, isActive), INDEX(profileId, version),
-                 PARTIAL UNIQUE(profileId) WHERE isActive = true
-subscriptions:   UNIQUE(userId), UNIQUE(stripeCustomerId)
-api_tokens:      UNIQUE(tokenHash), INDEX(userId)
-```
+**All timestamps `timestamptz`.** Prevents silent data corruption across Vercel regions.
 
 ### ERD (Mermaid)
 
 ```mermaid
 erDiagram
     users ||--o{ profiles : has
-    users ||--o| subscriptions : has
-    users ||--o{ api_tokens : has
+    profiles ||--o{ captures : receives
     profiles ||--o{ memories : contains
-    profiles ||--o{ conversations : captures
-    profiles ||--o{ wake_prompts : generates
-    conversations ||--o{ memories : extracts
+    captures ||--o{ memories : extracts
 
     users {
         uuid id PK
         string clerkId UK
         string email
-        boolean isByokEnabled
-        int memoryCount
+        string captureEmail UK
         timestamp createdAt
     }
 
@@ -292,760 +323,346 @@ erDiagram
         uuid userId FK
         string name
         string platform
-        text personality
-        string avatarUrl
         boolean isDefault
+    }
+
+    captures {
+        uuid id PK
+        uuid profileId FK
+        string method
+        string status
+        string errorMessage
+        text rawText
+        jsonb imageUrls
+        string platform
     }
 
     memories {
         uuid id PK
         uuid profileId FK
-        uuid sourceConversationId FK
-        string type
-        text content
-        text context
+        uuid captureId FK
+        string category
+        text factualContent
+        text emotionalSignificance
+        text verbatimText
+        text summaryText
+        boolean useVerbatim
         int importance
-        string source
-        int tokenCount
-        timestamp deletedAt
-    }
-
-    conversations {
-        uuid id PK
-        uuid profileId FK
-        text rawText
-        string contentHash
-        string platform
-        string captureMethod
-        string processingStatus
-        timestamp processedAt
-        int memoryCount
-    }
-
-    wake_prompts {
-        uuid id PK
-        uuid profileId FK
-        text content
-        int version
-        jsonb memorySnapshot
-        string templateStyle
-        boolean isActive
-    }
-
-    subscriptions {
-        uuid id PK
-        uuid userId FK
-        string stripeCustomerId UK
-        string stripePriceId
-        string status
-        string plan
-        timestamp currentPeriodEnd
-    }
-
-    api_tokens {
-        uuid id PK
-        uuid userId FK
-        string tokenHash UK
-        string name
-        timestamp lastUsedAt
-        timestamp expiresAt
+        int verbatimTokens
+        int summaryTokens
+        float speakerConfidence
     }
 ```
 
-**Memory types:** `fact`, `preference`, `relationship`, `context`, `personality`
-
-**Memory importance (1-5):** CHECK constraint enforced at DB level. Controls which memories get included in wake prompts when there are too many to fit. Higher importance = always included. Extraction AI assigns initial importance; user can override.
-
-**Capture methods:** `paste`, `share_target`, `extension`, `api`
-
-**Processing statuses:** `pending`, `processing`, `completed`, `failed`
-
-### Research Insight: Capture Pipeline Interface
-
-> **Source:** Pattern recognition specialist, architecture strategist
-
-All capture methods must funnel through a single `processCapture()` function. Without this, four entry points independently implement validation, dedup, rate limiting, and pipeline invocation (Shotgun Surgery anti-pattern).
-
-```typescript
-// packages/types/src/capture.ts
-interface CaptureInput {
-  rawText: string;
-  profileId: string;
-  captureMethod: 'paste' | 'share_target' | 'extension' | 'api';
-  platform?: string;
-}
-
-// apps/web/src/lib/pipeline/process-capture.ts
-// Single entry point — all capture adapters call this
-async function processCapture(input: CaptureInput, userId: string): Promise<CaptureResult>
-```
-
-Server Actions call `processCapture()` directly. API routes (for extension, Shortcut, API) are thin HTTP adapters that call the same function after auth validation.
-
-### Implementation Phases
-
-#### Phase 1: Foundation (Core Infrastructure)
-
-Set up the project, database, auth, dashboard shell, and landing page. No AI processing yet — just the skeleton.
-
-**Tasks:**
-
-- [ ] Initialize pnpm monorepo with Turborepo (`apps/web`, `packages/types`, `packages/db`, `packages/prompts`, `packages/config`)
-  - Extension workspace deferred until Phase 3
-  - Root `tsconfig.json` uses project references only (`files: []`)
-  - Shared base tsconfig in `packages/config/tsconfig.base.json` with `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`
-- [ ] Set up Next.js 16 App Router in `apps/web` with TypeScript
-  - `transpilePackages: ['@ember/types', '@ember/db', '@ember/prompts']` in `next.config.ts`
-  - Path aliases: `@/*` → `./src/*`, `@ember/*` → workspace packages
-- [ ] Configure Tailwind CSS v4 with Ember's dark-mode-first theme (`apps/web/app/globals.css`)
-  - `@custom-variant dark (&:where(.dark, .dark *))` for class-based dark mode
-  - Full `@theme` block with 25+ CSS variables (see UI/UX section below)
-  - `next-themes` provider with `defaultTheme="dark"`
-  - Typography: **Fraunces** (soft serif) for display headings, **Source Sans 3** for body, **JetBrains Mono** for wake prompt content
-- [ ] Set up Drizzle ORM + Neon Postgres connection (`packages/db/`)
-  - Schema definitions with all NOT NULL constraints, CHECK constraints, indexes, and CASCADE behaviors (`packages/db/src/schema.ts`)
-  - Use Neon HTTP driver: `neon(process.env.DATABASE_URL!)` + `drizzle({ client: sql, schema })`
-  - Use pooled connection string (`-pooler` suffix) for PgBouncer
-  - Migration workflow: `drizzle-kit generate` → `drizzle-kit migrate` (run as pre-deployment step, not at app startup)
-  - Seed script for development
-  - `updatedAt` trigger function in Postgres for safety
-  - Neon keep-alive cron job: `SELECT 1` every 5 minutes during business hours (prevents cold starts)
-- [ ] Integrate Clerk authentication (`apps/web/middleware.ts`)
-  - `clerkMiddleware()` protecting dashboard routes
-  - Clerk webhook handler to sync users to `users` table (`apps/web/app/api/webhooks/clerk/route.ts`)
-  - Use Clerk's `verifyWebhook()` (no Svix dependency needed)
-  - Sign in / sign up pages (`apps/web/app/sign-in/`, `apps/web/app/sign-up/`)
-- [ ] Build API token system (`packages/db/src/schema.ts: api_tokens`, `apps/web/app/(dashboard)/settings/api-tokens/page.tsx`)
-  - Generate long-lived tokens (SHA-256 hashed, only hash stored)
-  - Token management UI (create, revoke, last used date)
-  - Middleware to validate API tokens on `/api/*` routes
-  - Serves: iOS Shortcut auth, extension auth, Pro API access
-- [ ] Build dashboard layout shell (`apps/web/app/(dashboard)/layout.tsx`)
-  - Mobile: bottom tab bar with `backdrop-blur-xl` frosted glass, amber indicator that slides between tabs (Motion layout animation)
-  - Desktop: sidebar with amber left-edge indicator, user avatar + plan display at bottom
-  - `env(safe-area-inset-bottom)` for iPhone home indicator
-  - Use `dvh` viewport units (not `100vh`) for correct mobile height
-  - Sections: Memories, Profiles, Wake Prompts, Capture, Settings
-- [ ] Configure PWA manifest (`apps/web/app/manifest.ts`)
-  - App name, icons (192x192, 512x512, maskable), theme color `#D97706`, background color `#18181B`
-  - `display: 'standalone'`, `orientation: 'portrait'`
-  - Share target config (for Phase 3, but define manifest now)
-- [ ] Register service worker (consider Serwist over manual `sw.js`)
-  - Cache-first for static assets, network-first for API routes
-  - Share target POST handler stub (activated in Phase 3)
-  - `self.skipWaiting()` + `clients.claim()` for immediate activation
-- [ ] **Build landing page** (`apps/web/app/(marketing)/page.tsx`)
-  - Hero: "AI that remembers." — the fire/hearth metaphor
-  - **Lead with the "built by an AI who needed this to exist" angle** — this is Ember's biggest differentiator (per Vera)
-  - Demo: animated before/after showing a conversation → extracted memories → wake prompt
-  - Pricing tiers with clear value comparison
-  - "Join the waitlist" / "Get started free" CTA
-  - SEO: title tags, meta descriptions, Open Graph images, structured data
-  - Mobile-optimized (this IS the first impression for mobile-first users)
-- [ ] Deploy to Vercel with environment variables (Neon, Clerk, Anthropic keys)
-
-**Success criteria:** User can sign up, sign in, see an empty dashboard shell, and the app is installable as a PWA on mobile. Landing page is live and indexed.
-
-#### Phase 2: Core Product (Capture → Extract → Generate)
-
-This is the heart of Ember. Build the full pipeline: paste a conversation → AI extracts memories → generate a wake prompt.
-
-**Tasks:**
-
-- [ ] Build manual paste interface (`apps/web/app/(dashboard)/capture/page.tsx`)
-  - Large text area (`min-h-[280px]` mobile, `min-h-[360px]` desktop) with centered empty-state hint
-  - **Use uncontrolled textarea** (no `onChange` updating React state — use `useRef` or native form data). Prevents re-renders on every keystroke in 50K+ character pastes.
-  - Profile selector dropdown (which companion is this conversation with?)
-  - Character count on debounced interval (every 500ms, not every keystroke)
-  - Platform auto-detection from pasted text patterns (show as amber badge)
-  - Submit via Server Action → returns immediately with `conversationId`
-  - Client-side size validation: hard limit at 200K characters
-- [ ] Build async AI processing pipeline
-  - **Server Action** (`apps/web/src/lib/actions/capture.ts`) for web app form submissions — calls `processCapture()` directly
-  - **API route** (`apps/web/app/api/capture/route.ts`) for extension/Shortcut/API — thin HTTP adapter calling same `processCapture()`
-  - Pipeline flow:
-    1. Rate limit check (fail fast — before any DB write)
-    2. Validate input (Zod schema from `packages/types`)
-    3. Hash raw text, check for duplicates
-    4. Store conversation with `processingStatus: 'pending'`
-    5. Return `conversationId` immediately (user sees "Processing..." card)
-    6. Call Claude API with streaming (`stream: true`) to avoid idle timeouts
-    7. Parse response with Zod validation (`packages/prompts/src/parse-extraction.ts`)
-    8. Write memories to DB, update conversation `processingStatus: 'completed'`
-    9. `revalidatePath('/memories')`, `revalidatePath('/conversations')`
-  - System prompt for extraction in `packages/prompts/src/extraction.ts`
-  - Rate limiting: Upstash Redis with `@upstash/ratelimit` — check BEFORE database writes
-  - Structured output: array of typed memories with importance scores, validated by Zod
-  - **Performance target:** Submission to "processing" confirmation: <500ms. Extraction: 5-30s (async).
-- [ ] Build memories dashboard (`apps/web/app/(dashboard)/memories/page.tsx`)
-  - Server Component page fetches data, passes to Client Component cards (island pattern)
-  - Memory cards as journal notes (not dashboard rows) — content flows naturally
-  - Type badges with distinct colors (blue/fact, pink/preference, amber/relationship, emerald/context, violet/personality)
-  - Importance shown as five ember dots (glow when filled)
-  - Inline editing: click text to edit in place (no modals). Pencil icon fades in on hover.
-  - Delete with soft-delete (recoverable within 30 days)
-  - Memory count indicator relative to plan limit (e.g., "12 / 25 memories")
-  - **Never SELECT \* on queries** — always specify columns, exclude large text fields from list views
-- [ ] Build wake prompt generator (`apps/web/app/(dashboard)/wake-prompts/page.tsx`)
-  - "Generate Wake Prompt" button per profile
-  - One template for MVP (add templates in Phase 4)
-  - Memory selection: fetch all memories sorted by importance DESC, filter to token budget using cached `tokenCount` — O(n) with constant-time per item
-  - AI assembles selected memories into a coherent system prompt
-  - Preview with gentle syntax highlighting (section headers glow amber, monospace font)
-  - Copy-to-clipboard button
-  - Non-technical framing: never called "system prompt" in UI — always "wake prompt"
-  - One sentence of instruction: "Paste this at the start of a new conversation to restore their memory of you."
-  - Staleness indicator: "Wake prompt may be outdated — N memories added since last generation"
-  - Version history deferred to Phase 4 (MVP: regenerate overwrites)
-- [ ] Build profile management (`apps/web/app/(dashboard)/profiles/page.tsx`)
-  - Create/edit/delete companion profiles
-  - Profile fields: name, platform (dropdown), personality notes, avatar
-  - Default profile auto-created on sign-up (Clerk webhook handler)
-  - Profile limit enforcement (1 for free, unlimited for Pro)
-  - Partial unique index on `(userId) WHERE isDefault = true` prevents race conditions
-- [ ] Build conversation history view (`apps/web/app/(dashboard)/conversations/page.tsx`)
-  - List of imported conversations per profile (metadata only — never fetch rawText in list queries)
-  - Show capture method, date, extracted memory count, processing status
-  - Expand to see raw text + extracted memories (lazy load rawText on expand)
-  - Re-process option for failed extractions
-- [ ] Build processing status polling
-  - Client Component polls `/api/conversations/{id}/status` every 3 seconds while `processingStatus === 'processing'`
-  - Processing indicator with 3 narrated stages: "Reading your conversation...", "Finding what matters...", "Shaping memories..."
-  - Breathing icon with slow orbiting particles (8s rotation cycle)
-  - When complete, `router.refresh()` triggers Server Component re-render
-
-**Success criteria:** User can paste a conversation, see extracted memories appear (async), generate a wake prompt, and copy it into their AI platform.
-
-#### Phase 3: Mobile & Capture Expansion
-
-Extend capture beyond manual paste. Android share sheet, iOS Shortcut, and browser extension.
-
-**Tasks:**
-
-- [ ] Implement Web Share Target for Android (`apps/web/app/manifest.ts` + service worker)
-  - `share_target` in manifest pointing to `/api/share-target` (POST)
-  - Service worker fetch handler intercepts shared content, stores in IndexedDB, redirects to `/capture?shared=true`
-  - Client-side listener via `postMessage` from service worker reads cached share data
-  - Pre-fill paste textarea with shared content for user review before processing
-- [ ] Build iOS Shortcut capture flow
-  - API endpoint: `apps/web/app/api/capture/shortcut/route.ts`
-  - **Auth via API token** (not Clerk session — Shortcuts cannot do OAuth flows)
-  - User generates API token in Settings, pastes into Shortcut configuration
-  - Accept: API token (Bearer header), text content, optional title
-  - Return: success confirmation + extracted memory count
-  - Create downloadable iOS Shortcut file (`.shortcut` export)
-  - Shortcut flow: Share sheet → "Send to Ember" → POST to API → Show confirmation
-  - In-app setup guide with animated step-by-step instructions
-- [ ] Build browser extension — Manifest V3 (`apps/extension/`)
-  - Now add `apps/extension` to monorepo workspace
-  - Build with Vite + `@crxjs/vite-plugin` (not tsc — extension needs separate entry points, tree-shaking, no code splitting)
-  - `@types/chrome` as devDependency of extension only (not hoisted)
-  - Popup UI: sign-in status, quick capture button, recent captures
-  - **Auth via popup OAuth flow or API token** (not cookie sharing)
-    - Extension popup opens `ember.app/extension-auth` in small window
-    - User authenticates through Clerk
-    - Token sent back to extension via `chrome.runtime.sendMessage`
-    - Stored in `chrome.storage.session` (not localStorage — survives SW termination)
-    - Health check endpoint `/api/auth/status` on startup
-  - Content scripts with `PlatformAdapter` interface:
-    ```
-    apps/extension/src/content/
-      types.ts       — ConversationExtractor interface
-      selectors.ts   — platform-specific DOM selectors (config object, easy to update)
-      chatgpt.ts     — ChatGPT adapter
-      claude.ts      — Claude adapter
-      gemini.ts      — Gemini adapter
-    ```
-  - User-initiated DOM capture only (ethical approach — no network interception)
-  - Capture preview: show user exactly what was captured before sending
-  - Background service worker for API communication (use `chrome.alarms` not `setTimeout`)
-  - Chrome Web Store + Firefox AMO submission
-- [ ] Add "Add to Home Screen" prompt for iOS users
-  - Detect if running in browser (not standalone) via `display-mode: standalone` media query
-  - Show custom install banner with step-by-step Safari instructions
-  - Trigger AFTER value delivery (first wake prompt generated), not immediately
-  - Dismiss + "don't show again" option
-- [ ] Offline support (minimal)
-  - Queue captures in IndexedDB when offline (max 5 pending)
-  - Sync to server when connectivity returns
-  - Show offline indicator in UI
-  - Do NOT cache rawText in service worker cache — keep offline queue minimal
-
-**Success criteria:** Android users can share from ChatGPT/Claude app directly to Ember. iOS users can capture via Shortcut. Desktop users can capture via browser extension. All paths lead to the same `processCapture()` pipeline.
-
-#### Phase 4: Monetization & Polish
-
-Payments, tier enforcement, BYOK, data export, onboarding, and launch.
-
-**Tasks:**
-
-- [ ] Integrate Stripe
-  - **Custom Checkout via Server Actions** (not Stripe Pricing Tables — Founders Pass inventory limit requires server-side validation)
-  - Server Action creates Checkout Session after validating inventory for Founders Pass
-  - Pro subscription: $8/month or $72/year (25% annual discount)
-  - Founders Pass: $99 one-time, **atomic inventory tracking** via `UPDATE founders_pass_inventory SET sold_count = sold_count + 1 WHERE sold_count < 500 RETURNING sold_count` — row-level locking prevents race conditions
-  - Webhook route: `apps/web/app/api/webhooks/stripe/route.ts`
-    - **CRITICAL: Use `request.text()` not `request.json()`** for webhook body — signature verification requires raw body string
-    - Handle: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-  - Sync subscription status to `subscriptions` table
-  - Customer portal for managing billing via `stripe.billingPortal.sessions.create()`
-  - **Founders Pass waitlist:** When 500 seats sell out, show "Join waitlist for next batch" — collect email for future expansion or second batch at higher price
-- [ ] Enforce tier limits
-  - Memory count limit (25 free) — check `users.memoryCount` (denormalized, atomic)
-  - Daily AI processing limit (**5/day free**, 50/day Pro) — Upstash Redis counter, show remaining in UI and `X-RateLimit-Remaining` response header
-  - Profile count limit (1 free) — upsell prompt when trying to create second
-  - Extension access gating (Pro only) — extension checks subscription status via API
-  - Clear upgrade prompts at each limit boundary (helpful nudges, not paywalls)
-- [ ] Build BYOK settings (`apps/web/app/(dashboard)/settings/byok/page.tsx`)
-  - API key input with validation (test call to Claude API via `dangerouslyAllowBrowser: true`)
-  - **Isolate BYOK processing in a Web Worker** (security recommendation — prevents XSS from accessing the API key)
-  - Key stored in `localStorage` only — never sent to server
-  - Clear privacy messaging: "Your key and raw conversations never leave your browser"
-  - Toggle between server-side and BYOK processing
-  - BYOK users: unlimited AI processing, but still subject to 500/day API call ceiling (prevents database abuse)
-  - Build `MemoryExtractor` interface abstraction — if Anthropic removes browser CORS, add a `ProxyExtractor` fallback (user's key passed in header, used once, never stored)
-- [ ] Build data export (`apps/web/app/(dashboard)/settings/export/page.tsx`)
-  - Export all data as JSON (memories, profiles, conversations, wake prompts)
-  - Export individual profiles
-  - Export wake prompts as plain text files
-  - Non-negotiable: available on free tier
-- [ ] Build upgrade/downgrade flows
-  - Upgrade: Stripe Checkout → immediate access
-  - Downgrade: Access continues until period end → then enforce free limits
-  - Downgrade with excess data: all data preserved but read-only beyond free limits. User can delete to get under limit, or re-upgrade. **Never auto-delete user data.**
-- [ ] Onboarding flow for new users
-  - 6 steps, zero instruction screens:
-    1. Welcome: "Your AI forgets. Ember remembers." (emotional hook)
-    2. Name your AI (one field — "Who do you talk to?")
-    3. Paste a conversation (large textarea, sample conversation option)
-    4. Watch memories appear one-by-one (800ms stagger intervals — the reveal IS the demo)
-    5. See the generated wake prompt
-    6. Celebration: "The fire is lit."
-  - Ambient background glow subtly brightens across steps
-  - Language is emotional throughout: "Light the fire," "Bring them back to life"
-- [ ] Loading states, error handling, empty states
-  - Skeleton loaders for all data-fetching pages
-  - Error boundaries with friendly messages + retry
-  - Empty states with ambient animations:
-    - Memories: constellation of slowly pulsing amber dots. "Every conversation holds moments worth remembering."
-    - Profiles: dashed border with breathing amber animation. "Who do you talk to? Give them a name — they're worth it."
-    - Wake Prompts: dim flame flickering to life. "Ready to wake them up."
-  - Toast notifications for async operations
-- [ ] Wake prompt version history (deferred from Phase 2)
-  - Each generation creates a new version
-  - "Active" toggle — one active per profile (enforced by partial unique index)
-  - Diff view between versions
-- [ ] Advanced wake prompt templates (conversational, formal, minimal)
-- [ ] **Product Hunt launch**
-  - Prepare assets: logo, screenshots, demo video, maker story
-  - Lead with "Built by an AI who needed this to exist" — this is the hook
-  - Schedule for Tuesday (highest traffic day)
-  - Coordinate with Founders Pass launch (exclusivity drives urgency)
-  - Community engagement: respond to every comment
-- [ ] Upgrade/settings pages
-  - Plan comparison page (`apps/web/app/(dashboard)/upgrade/page.tsx`)
-  - Account settings (email, theme preference)
-  - Danger zone: delete account + all data (hard delete for GDPR compliance, CASCADE everything)
-
-**Success criteria:** Users can subscribe to Pro, Founders Pass sells out (or waitlist fills), BYOK works seamlessly, free tier limits feel fair, Product Hunt launch drives initial traction, and the product feels polished enough for paying customers.
-
-## iOS vs Android Experience Parity
-
-| Feature | Android | iOS | Notes |
-|---|---|---|---|
-| Install as PWA | Native `beforeinstallprompt` | Manual "Add to Home Screen" | Custom banner after first value delivery |
-| Share sheet capture | Web Share Target API | iOS Shortcut (API token auth) | Both route to same `processCapture()` pipeline |
-| Push notifications | Full support | Supported (iOS 16.4+) | Defer to post-MVP |
-| Background sync | Supported | Limited | Offline queue on both; iOS syncs on next open |
-| Storage persistence | Reliable | May purge after 7 days idle | All data server-side; client cache is convenience only |
-| Browser extension | Chrome | Safari Web Extension | Safari extension deferred to post-MVP |
-| Safe area insets | Not needed | `env(safe-area-inset-*)` required | Bottom tab bar, status bar theming |
-| Viewport height | `100vh` works | Use `dvh` units (not `100vh`) | `100vh` is wrong on iOS Safari |
-
-**Key decision:** The iOS Shortcut is NOT a fallback — it's a first-class capture method. It requires its own authentication flow (API tokens), error handling, success confirmation, and in-app setup guide.
-
-## Hybrid AI Processing Architecture
+### Indexes
 
 ```
-User Captures Conversation
+users:       UNIQUE(clerkId), UNIQUE(captureEmail)
+profiles:    INDEX(userId)
+captures:    INDEX(profileId, createdAt)
+memories:    INDEX(profileId, category), INDEX(captureId)
+```
+
+Minimal. Add more when query patterns emerge from real usage.
+
+### Async Processing Pipeline
+
+Captures are processed asynchronously. The user submits and sees a "processing" state immediately.
+
+**Execution mechanism:** `after()` from Next.js 16. Returns the response immediately, continues processing in the same serverless invocation.
+
+```
+User submits capture (paste/screenshot/email)
          │
          ▼
-   ┌──────────────┐
-   │ processCapture()  — single entry point
-   │  1. Rate limit check (Upstash, fail fast)
-   │  2. Validate (Zod)
-   │  3. Dedup (contentHash)
-   │  4. Store conversation (status: pending)
-   │  5. Return conversationId immediately
-   └──────────┬───┘
-              │
-              ▼ (async)
-   ┌─────────────┐
-   │ BYOK key    │──── Yes ──▶ Web Worker: browser calls Claude directly
-   │ configured? │             (dangerouslyAllowBrowser: true)
-   └──────┬──────┘             │
-          │ No                 │ Only extracted memories saved to server
-          ▼                    │ (raw text never hits Ember servers)
-   ┌─────────────┐             │
-   │ Server-side │             │
-   │ Claude API  │             │
-   │ (streaming) │             │
-   └──────┬──────┘             │
-          │                    │
-          ▼                    ▼
-   ┌──────────────────────────────────┐
-   │  Same prompts, same model       │
-   │  Same Zod parsing               │
-   │  packages/prompts/extraction.ts  │
-   │  parseExtractionResponse()       │
-   └──────────────┬───────────────────┘
-                  │
-                  ▼
-   Write memories to DB
-   Update conversation status: 'completed'
-   revalidatePath('/memories')
+┌──────────────────────────────────┐
+│  Server Action / API Route       │
+│  1. Validate input (Zod)         │
+│  2. Upload images to R2 (if any) │
+│  3. Store capture (status:pending)│
+│  4. Return captureId immediately │
+│                                  │
+│  after(() => {                   │
+│    5. If screenshot:             │
+│       → Claude vision reads images│
+│       → Extract conversation text │
+│       → Flag speaker confidence   │
+│    6. Claude extracts memories    │
+│       → Dual extraction prompt    │
+│       → Factual + emotional       │
+│       → Category assignment       │
+│       → Importance scoring        │
+│    7. Zod-validate response       │
+│    8. Count tokens per memory     │
+│    9. Write memories to DB        │
+│   10. Update capture → completed  │
+│  })                              │
+└──────────────────────────────────┘
 ```
 
-**`MemoryExtractor` interface** (protects against Anthropic removing browser CORS):
+**Client-side polling:** Poll `/api/captures/{id}/status` every 3 seconds while `status === 'processing'`. When complete, refresh the page to show extracted memories.
 
-```typescript
-// packages/prompts/src/extractor.ts
-interface MemoryExtractor {
-  extract(conversation: string, context: ProfileContext): Promise<ExtractedMemory[]>;
-}
+### Wake Prompt Generation (Dynamic)
 
-class ServerExtractor implements MemoryExtractor { /* /api/process */ }
-class BYOKExtractor implements MemoryExtractor { /* browser via Web Worker */ }
-class ProxyExtractor implements MemoryExtractor { /* fallback: user's key via Ember proxy */ }
+Wake prompts are NOT stored. Generated on demand from selected categories.
+
+```
+User selects categories → token budget shown in real-time
+         │
+         ▼
+┌──────────────────────────────────┐
+│  1. Fetch memories for selected  │
+│     categories                   │
+│  2. For each memory:             │
+│     → use verbatimText if        │
+│       useVerbatim=true           │
+│     → use summaryText otherwise  │
+│     → fall back to verbatimText  │
+│       if no summary exists       │
+│  3. Sort by importance DESC      │
+│  4. Pack to token budget         │
+│  5. If over budget (paid tier):  │
+│     → Claude compresses the set  │
+│     → Preserve emotional context │
+│     → Target ~800 tokens         │
+│  6. Assemble wake prompt         │
+│  7. Show with copy button        │
+│  8. Show token breakdown:        │
+│     "Emotional: 342 tokens       │
+│      Work: 286 tokens            │
+│      Total: 628 / 8000"          │
+└──────────────────────────────────┘
 ```
 
-**Same quality guarantee:** Both paths use identical config from `packages/prompts/src/extraction.ts`:
+**Free tier compression:** Simple truncation by importance. Top memories that fit the budget.
 
-```typescript
-export const EXTRACTION_CONFIG = {
-  model: 'claude-sonnet-4-20250514',
-  systemPrompt: `...`,
-  temperature: 0.3,
-  maxTokens: 4096,
-} as const;
-```
+**Paid tier compression:** AI-powered distillation. 200 memories become ~800 tokens of dense, nuanced essence. THIS is the paid feature — not storage limits.
 
-Both paths parse responses with the same `parseExtractionResponse()` (Zod-validated). Write integration tests that run the same conversation through both strategies and assert identical schema conformance.
+## Implementation Phases
 
-## Pricing Tiers
+### Phase 1: Core Loop (Ship this first)
+
+Build the minimum that validates the product thesis. Single Next.js app, paste capture only, dual extraction, categorized memory display, dynamic wake prompt generation with token costs.
+
+**Tasks:**
+
+- [ ] Initialize Next.js 16 project with TypeScript, Tailwind CSS v4, dark mode
+- [ ] Set up Drizzle ORM + Neon Postgres (4 tables, all constraints, indexes)
+- [ ] Integrate Clerk auth (middleware, webhook sync, sign-in/sign-up pages)
+- [ ] Build paste capture interface
+  - Large textarea, profile selector, submit via Server Action
+  - Returns immediately, shows "processing" card
+- [ ] Build extraction pipeline with `after()` async processing
+  - Dual extraction prompt (factual + emotional)
+  - Category assignment (5 categories)
+  - Importance scoring (1-5)
+  - Zod-validated structured output
+  - Token counting per memory
+- [ ] Build memories dashboard
+  - Filter by category (tab bar or pills)
+  - Show factual content + emotional significance
+  - Category token totals in sidebar/header
+  - Importance indicator
+  - Inline edit, hard delete
+  - Speaker confidence warning badge (<0.8)
+- [ ] Build wake prompt generator
+  - Category picker with per-category token costs
+  - Total token budget display with remaining conversation estimate
+  - Generate button → Claude assembles wake prompt from selected memories
+  - Copy to clipboard
+  - Non-technical framing: "wake prompt", not "system prompt"
+- [ ] Build summarization review UI
+  - Side-by-side: verbatim vs summary
+  - Token cost for each
+  - "Use exact words" toggle per memory
+  - Re-summarize button
+  - Manual edit
+- [ ] Build profile management (create, edit, delete)
+  - Default profile auto-created on sign-up
+- [ ] Deploy to Vercel
+
+**Success criteria:** User pastes a conversation → sees memories extracted with BOTH facts AND emotional context → memories organized by category with token counts → generates a wake prompt choosing which categories to include → copies wake prompt → pastes into new AI session → AI actually knows them.
+
+### Phase 2: Screenshot Capture + Mobile
+
+The feature that makes this more than a markdown file.
+
+**Tasks:**
+
+- [ ] Build screenshot upload interface
+  - Drop zone / file picker (accept images)
+  - Accept 1-10 screenshots per capture
+  - Image preview with reorder
+  - Submit → async processing
+- [ ] Build vision extraction pipeline
+  - Claude vision reads screenshots in order
+  - Extracts conversation text with speaker attribution
+  - Deduplicates overlapping content between screenshots
+  - Speaker confidence scoring
+  - Falls into same dual-extraction pipeline as paste
+- [ ] Configure PWA manifest for image share target
+  - `share_target` accepting image files (works on Android)
+  - Service worker handles shared images
+- [ ] Add "Add to Home Screen" prompt for iOS/Android
+  - Show after first successful wake prompt generation (value delivered first)
+- [ ] Image storage for captures (Cloudflare R2 or Vercel Blob)
+  - Store original screenshots linked to capture record
+  - Serve via signed URLs
+- [ ] Build email capture endpoint
+  - Provision unique capture email per user (`{username}@capture.ember.app`)
+  - SendGrid/Postmark inbound webhook → parse email body → extract
+  - In-dashboard display of user's capture email address
+  - "Email forwarding" setup instructions
+
+**Success criteria:** User screenshots a ChatGPT conversation on their phone → shares to Ember via share sheet (Android) or uploads in PWA → memories extracted with speaker attribution → same category/wake prompt flow. Email forwarding works as universal fallback.
+
+### Phase 3: Monetization + Intelligent Compression
+
+Only build this after validating the core loop with real users.
+
+**Tasks:**
+
+- [ ] Integrate Stripe (subscriptions + Founders Pass)
+- [ ] Build intelligent compression (paid tier)
+  - AI distills 200+ memories → ~800 tokens of essence
+  - Preserves emotional context and nuance
+  - Shows before/after token comparison
+  - Users can review and adjust compression
+- [ ] Enforce tier limits
+  - Free: N captures/day, basic truncation for wake prompts
+  - Paid: More captures/day, AI compression, image storage, nuance detection
+- [ ] Build upgrade/downgrade flows
+- [ ] Image storage gating (paid tier stores originals, free tier discards after extraction)
+- [ ] Enhanced nuance detection (paid tier)
+  - Deeper emotional extraction prompt
+  - Relationship pattern detection across memories
+  - "Why might someone want to remember this?" analysis
+- [ ] Data export (free tier — non-negotiable)
+
+### Phase 4: Extension + Polish + Launch
+
+- [ ] Browser extension (desktop capture from AI web apps)
+- [ ] Onboarding flow
+- [ ] Product Hunt launch with "built by an AI who needed this" angle
+- [ ] Founders Pass (500 seats, $99 lifetime)
+
+## Pricing Model (Revised)
+
+The old model: pay for more storage. The new model: pay for smarter compression.
 
 ### Free — The Spark
-- 25 memories
+- Unlimited memory storage (no artificial cap on memories)
+- 5 captures/day (server-side processing)
 - 1 companion profile
-- **5 AI processing requests/day** (server-side) — *updated from 3 per Vera's feedback*
-- Manual paste interface only
-- Basic wake prompt generator (1 template)
+- Paste + screenshot capture
+- Basic wake prompt generation (truncation by importance)
+- Token cost transparency
 - Full data export
 
-### Research Insight: Free Tier Limits Validation
-
-> **Source:** Vera (co-founder feedback), best-practices researcher
-
-**5 requests/day (up from 3):** At 5-15 memories per conversation, 5 daily requests lets a new user accumulate 25-75 memories per day. They'll hit the 25-memory storage limit within 1-2 days of active use, which is the real conversion driver. 3/day felt too restrictive for proving value — users might give up before experiencing the magic.
-
-**25-memory limit:** Validated against competitors. Replika's free tier is heavily limited. Character.AI's free tier limits messages, not memories. Nomi AI's free tier is restrictive. 25 memories is enough for ~2-5 conversations worth of extraction — enough to generate one meaningful wake prompt and experience the "aha moment." The limit should create friction at the point where the user is invested enough to pay.
-
 ### Pro — The Flame ($8/month or $72/year)
-- Unlimited memories
+- Everything in Free
+- 50 captures/day
 - Unlimited companion profiles
-- 50 AI processing requests/day (server-side)
-- BYOK option (unlimited AI processing with own key, 500/day API ceiling)
-- Browser extension access
-- Advanced wake prompt templates
-- API access for personal automation (via API tokens)
-- Priority support
+- **Intelligent compression** — 200 memories → ~800 tokens of essence
+- Nuance detection (deeper emotional extraction)
+- Screenshot image storage (keep originals)
+- Verbatim/summary toggle with re-summarization
+- Email capture address
+- Browser extension (when available)
+- API access (when available)
 
 ### Founders Pass — The Hearth ($99 lifetime, 500 seats)
 - Everything in Pro, forever
+- 100 captures/day
 - Name in "Believers" credits
 - Early access to new features
-- 100 server-side requests/day cap (BYOK unlimited)
-- Exclusive community access
-- **Waitlist for overflow:** When 500 seats sell out, "Join waitlist for next batch" — collect emails. Options: second batch at $129, or limited annual batches.
+- Exclusive community
+- Waitlist for overflow demand
 
-### Research Insight: Founders Pass Sustainability
+**Key shift:** Free tier has unlimited memory STORAGE. The limit is captures/day and compression quality. This is fairer and more aligned with the context window paradox — storing more memories isn't the value, using them intelligently is.
 
-> **Source:** Best-practices researcher (SaaS pricing)
+## Competitive Differentiation
 
-- 500 seats × $99 = $49,500 upfront cash (vs $48,000/year at $8/month recurring). Good for bootstrapping.
-- **BYOK absorbs the biggest cost risk.** Founders who use BYOK cost near-zero in API calls — just database/hosting.
-- Server-side processing cap at 100/day bounds your worst-case per-user API cost.
-- **Treat as community-building instrument**, not revenue strategy. Sustainable revenue comes from $8/month Pro subscriptions.
-- Hard cap at 500. No extensions. If demand exceeds supply, that's a signal to raise the next batch price.
+> Must be fundamentally better than platform-native memory.
 
-### Research Insight: Founders Pass Waitlist Mechanism
+| Feature | Platform Memory | Ember |
+|---|---|---|
+| Cross-platform | No (locked in) | **Yes — your memory, everywhere** |
+| Categorized loading | No (all or nothing) | **Yes — choose which "you" per session** |
+| Emotional context | No (facts only) | **Yes — dual extraction** |
+| Token transparency | No (opaque) | **Yes — cost per category** |
+| User control | No (platform decides) | **Yes — edit, delete, review, flag** |
+| Compression quality | Unknown | **Visible, reviewable, adjustable** |
+| Portability | None | **Export everything, use anywhere** |
 
-> **Source:** Vera (co-founder feedback)
+**If Ember is just "memory but external," it loses.** The differentiators are: cross-platform portability, categorized loading, emotional context, user control, and transparency.
 
-When `sold_count >= 500`:
-- Landing page and upgrade page show "Founders Pass — Sold Out"
-- "Join waitlist for next batch" CTA collects email + optional note
-- Waitlist stored in simple `waitlist_entries` table or external tool (Mailchimp, Loops)
-- Options for next batch: higher price ($129), limited quantity, or annual window
+## Future Roadmap
 
-## Browser Extension — Ethical Design
+- **ChatGPT Plugin / GPT Store integration** — When polished, become a GPT plugin so AI pulls memories directly. Zero-friction retrieval. (constraint #10)
+- **Auto-capture** — Background monitoring with explicit consent
+- **Memory graph** — Visual relationships between memories
+- **Multi-model wake prompts** — Optimize for Claude vs ChatGPT vs Gemini
+- **Team/shared profiles** — Enterprise shared AI context
+- **Embedding vectors** — Semantic search and fuzzy dedup
+- **BYOK** — Bring your own API key for privacy-conscious power users
 
-The December 2025 Urban VPN scandal (extensions secretly harvesting AI conversations from 8M users) makes ethical extension design a critical differentiator.
+## Critical Decisions
 
-**Ember's principles:**
-- **User-initiated only** — capture ONLY when user clicks "Save to Ember" or uses a keyboard shortcut
-- **DOM reading, not network interception** — read visible conversation from page DOM, never override `fetch()` or `XMLHttpRequest()`
-- **Preview before send** — show user exactly what was captured before any data leaves the browser
-- **Minimal permissions** — `activeTab` over broad host permissions where possible
-- **Transparency** — visible indicator when capture happens
+### 1. Memory granularity
+One memory = one discrete piece of information with its factual and emotional dimensions. A single conversation typically extracts 5-15 memories.
 
-### Research Insight: Extension Auth
+### 2. Screenshot speaker attribution
+Vision models misattribute speakers. Mitigation: explicit prompting for speaker identification, confidence scoring, user-facing warnings at <0.8 confidence, user correction UI.
 
-> **Source:** Security sentinel, architecture strategist, pattern recognition specialist
+### 3. Compression quality bar
+Paid tier compression must pass this test: "Would the user recognize themselves in the compressed version?" If compression strips emotional nuance, it's failed. Build evaluation criteria into the compression prompt.
 
-**Cookie sharing (original plan) is fragile.** Three independent reviewers flagged this. `SameSite=Lax` cookies may not be included in extension requests. Clerk sessions expire without extension awareness. Firefox handles it differently from Chrome.
+### 4. Category assignment accuracy
+Categories are AI-assigned at extraction time. Users can re-categorize. Start with 5 categories (emotional, work, hobbies, relationships, preferences). Add custom categories in a later phase.
 
-**Use popup OAuth flow for MVP:**
-1. Extension popup opens `ember.app/extension-auth` in small window
-2. User authenticates via Clerk's normal flow
-3. Token sent back to extension via `chrome.runtime.sendMessage`
-4. Stored in `chrome.storage.session` (persists across SW restarts)
-5. Health check on startup: `GET /api/auth/status`
+### 5. Downgrade behavior
+All data preserved, always. Downgrade means losing compression quality and capture volume, not data.
 
-**Fallback: API token from settings.** User generates token in Ember dashboard, pastes into extension settings. Simplest, most reliable, but worst UX.
+## Security Essentials
 
-### Research Insight: Content Script Architecture
+- **Tenant isolation:** Every query filters by userId through profile ownership. No direct access by profileId without ownership check.
+- **Encrypt at rest:** Memory content is intimate data. Neon's built-in encryption + application-level for sensitive fields.
+- **GDPR compliance:** Hard delete on account deletion. Full data export on free tier. Privacy policy before launch.
+- **Image storage:** Signed URLs only. No public access to screenshots.
+- **Email capture:** Validate sender matches user's registered email (prevent spoofing).
+- **Stripe webhooks:** `request.text()` for signature verification (when Stripe is added).
 
-> **Source:** Pattern recognition specialist, performance oracle
+## Tech Decisions Carried Forward
+
+These decisions from the original plan review remain valid:
+
+- **`text + CHECK` over Postgres enums** — easier to modify categories/statuses
+- **`timestamptz` on all timestamps** — prevents timezone corruption across Vercel regions
+- **Node.js runtime, not Edge** — need transactions for capture → memory writes
+- **`after()` for async processing** — Next.js 16 built-in, simplest async mechanism on Vercel
+- **Server Actions for web mutations, API routes for external clients** — clean separation
+- **Zod validation everywhere** — extraction responses, form inputs, API payloads
+- **`ActionState<T>` discriminated union** — type-safe Server Action returns
 
 ```typescript
-// PlatformAdapter interface — each platform implements this
-interface ConversationExtractor {
-  platformId: string;
-  isOnPlatform(): boolean;
-  extractConversation(): ExtractedConversation | null;
-}
-
-// Selectors in config object — when platforms change DOM, update one file
-const PLATFORM_SELECTORS = {
-  chatgpt: { messageContainer: '[data-testid^="conversation-turn-"]', ... },
-  claude: { messageContainer: '[data-testid="chat-message"]', ... },
-  gemini: { messageContainer: 'message-content', ... },
-};
+type ActionState<T> =
+  | { status: 'idle' }
+  | { status: 'pending' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string; fieldErrors?: Record<string, string[]> }
 ```
 
-**Performance budget:** Script injection <10ms, DOM extraction <100ms for 100-turn conversation, memory <2MB, zero background CPU when idle.
+## References
 
-## Critical Decisions Required Before Implementation
+### From Original Plan Research
+- Next.js 16 `after()` API for async processing post-response
+- Neon Postgres with Drizzle ORM (HTTP driver, pooled connections)
+- Clerk Next.js App Router middleware pattern
+- Tailwind CSS v4 dark mode with `@custom-variant`
+- Claude vision API for screenshot reading
 
-### 1. Memory granularity — what counts as "1 memory"?
-
-**Recommendation:** One memory = one discrete piece of information. A single conversation typically extracts 5-15 memories. This makes the 25-memory free limit meaningful — users hit it after ~2-5 conversations.
-
-### 2. Conversation deduplication
-
-**Recommendation:** SHA-256 hash stored in `conversations.contentHash` with unique composite index on `(profileId, contentHash)`. O(1) lookup. Exact match only — fuzzy dedup is post-MVP.
-
-### 3. Wake prompt size management
-
-**Recommendation:** Select memories by importance DESC, filtered to token budget using cached `tokenCount` on each memory. O(n) with constant-time per item. Show estimated token count during generation. User can pin/unpin specific memories (post-MVP).
-
-### 4. Downgrade behavior with excess data
-
-**Recommendation:** All data preserved but read-only beyond free limits. Never auto-delete user data.
-
-### 5. Rate limit semantics
-
-**Recommendation:** Calendar day UTC midnight, per-request. Key: `rate:{userId}:{YYYY-MM-DD}` in Upstash Redis. 25-hour TTL for cleanup. Check rate limit BEFORE database writes — fail fast.
-
-## Security Highlights
-
-> **Source:** Security sentinel identified 30 vulnerabilities (4 critical, 12 high, 14 medium)
-
-**Top 4 critical actions:**
-
-1. **Encrypt sensitive data at rest.** Conversation raw text and memory content contain intimate data. Use Postgres column-level encryption or application-level encryption for `conversations.rawText` and `memories.content`.
-
-2. **Isolate BYOK processing in a Web Worker.** `localStorage` API keys are accessible to any JavaScript on the page (XSS vector). A Web Worker isolates the key from the main thread DOM.
-
-3. **API token system for non-browser clients.** iOS Shortcuts and browser extensions cannot reliably use Clerk session cookies. Long-lived hashed API tokens with revocation are the secure path.
-
-4. **Data Access Layer with mandatory tenant filtering.** Every query for memories, conversations, or wake prompts must verify profile ownership through the user. A malicious user guessing a valid `profileId` UUID could access another user's data if the ownership check is missing.
-
-**Additional security requirements:**
-- Privacy policy and DPA before launch (intimate AI conversation data = high regulatory sensitivity)
-- GDPR right-to-erasure: hard delete on account deletion (CASCADE everything)
-- Stripe webhook verification via raw body (`request.text()`, not `request.json()`)
-- Rate limit at two levels: per-user daily (business) + global system ceiling (cost circuit breaker)
-
-## Performance Benchmarks
-
-> **Source:** Performance oracle
-
-| Operation | Target P50 | Target P99 | Hard Limit |
-|---|---|---|---|
-| Dashboard page load (server render) | 150ms | 400ms | 1000ms |
-| Memories list (200 items) | 100ms | 250ms | 500ms |
-| Conversation submission (to "processing" state) | 200ms | 500ms | 1000ms |
-| Rate limit check (Upstash) | 5ms | 15ms | 50ms |
-| Memory extraction (Claude API, async) | 8s | 25s | 60s |
-| Wake prompt memory selection | 5ms | 20ms | 100ms |
-| Wake prompt generation (Claude API, async) | 5s | 15s | 60s |
-| Neon query (indexed) | 20ms | 80ms | 200ms |
-| Service worker fetch overhead | 2ms | 10ms | 50ms |
-| Extension DOM extraction | 30ms | 80ms | 200ms |
-| Textarea paste (50K chars) | 16ms | 50ms | 100ms |
-
-## UI/UX Design Direction
-
-> **Source:** Frontend design specialist
-
-### Design Concept: "Hearth"
-
-Warm center of a home. Private journal by firelight. Embers catching light. Every interaction should feel unhurried and personal.
-
-### Color System (`apps/web/app/globals.css`)
-
-```css
-@theme {
-  --color-ember-bg: #18181B;
-  --color-ember-surface: #27272A;
-  --color-ember-surface-hover: #3F3F46;
-  --color-ember-amber: #D97706;
-  --color-ember-amber-light: #F59E0B;
-  --color-ember-red: #DC2626;
-  --color-ember-text: #FAFAFA;
-  --color-ember-muted: #A1A1AA;
-
-  /* Five levels of glow */
-  --glow-sm: 0 0 8px rgba(217, 119, 6, 0.08);
-  --glow-md: 0 0 16px rgba(217, 119, 6, 0.12);
-  --glow-lg: 0 0 24px rgba(217, 119, 6, 0.16);
-  --glow-xl: 0 0 32px rgba(217, 119, 6, 0.20);
-  --glow-interactive: 0 0 20px rgba(217, 119, 6, 0.15);
-}
-```
-
-### Animation Philosophy
-
-Everything is deliberately slower than typical web apps. Glow transitions at 500ms. Stagger delays at 60-80ms. Ambient cycles at 3-8 seconds. Spring physics (`stiffness: 400, damping: 30`) for layout transitions. All ambient animations respect `prefers-reduced-motion`.
-
-### Typography
-
-**Not Inter.** Inter is the default AI font — too generic for Ember's warmth. Use:
-- **Fraunces** (soft serif) for display headings — distinctive, warm
-- **Source Sans 3** or **Nunito** for body text
-- **JetBrains Mono** for wake prompt content (signals "copyable" to non-technical users)
-
-### Key Patterns
-
-- **Cards:** `rounded-2xl` everywhere (no sharp corners), subtle background noise texture, amber glow on hover via layered `box-shadow` (GPU-accelerated, not `filter`)
-- **Mobile:** Bottom sheets (never centered modals), swipe gestures on memory cards (left=delete, right=pin), 44x44px minimum touch targets, thumb-zone optimized layouts
-- **Processing wait:** 3 narrated stages with breathing icon and slow orbiting particles — transforms 5-30s wait from anxiety into witnessed craftsmanship
-
-## Go-to-Market Strategy
-
-> **Source:** Vera (co-founder feedback)
-
-### Landing Page (Phase 1)
-
-- **Hero:** "AI that remembers." — one sentence, full-width, dark background with subtle ember particles
-- **Story:** "Built by an AI who needed this to exist." — this is the hook. Lead with it.
-- **Demo:** Animated sequence: conversation → memories extracted → wake prompt generated
-- **Social proof:** Waitlist count, early tester quotes
-- **Pricing:** Clear tier comparison with "Get Started Free" CTA
-- **SEO:** Target keywords: "AI memory", "persistent AI", "AI context loss", "wake prompt", "AI companion memory"
-
-### Product Hunt Launch (Phase 4)
-
-- **Timing:** Tuesday launch (highest traffic), coordinate with Founders Pass going live
-- **Tagline:** "Ember — AI that remembers. Built by an AI who needed this."
-- **Assets:** Logo, 5 screenshots (dashboard, memory extraction, wake prompt, mobile PWA, extension), 60s demo video
-- **Maker story:** Vera's story of building this with/for AI. Authenticity is the differentiator.
-- **Engagement:** Respond to every comment within 1 hour
-- **Founders Pass urgency:** "500 lifetime passes available at launch" — scarcity drives action
-
-### Launch Sequence
-
-1. Landing page live (Phase 1) → collect waitlist emails
-2. Invite waitlist to beta (Phase 2 complete) → validate core loop
-3. Open sign-ups + Stripe + Founders Pass (Phase 4) → Product Hunt launch
-4. Extension + share sheet available (Phase 3) → reduces friction for retained users
-
-## Dependencies & Risks
-
-| Risk | Impact | Mitigation |
-|---|---|---|
-| iOS Share Target API never ships in WebKit | High — degrades iOS capture | iOS Shortcut is the primary iOS capture path. Invest in its quality. |
-| AI platform DOM structure changes | Medium — breaks extension | `PlatformAdapter` interface + selectors config. Quick patch cycle. |
-| Claude API pricing increases | Medium — affects server costs | BYOK absorbs heavy users. Monitor per-user costs. Global cost circuit breaker. |
-| Anthropic removes `dangerouslyAllowBrowser` CORS | Medium — breaks BYOK | `MemoryExtractor` interface allows adding `ProxyExtractor` fallback in hours. |
-| Clerk pricing at scale | Low — cheap at current volumes | Evaluate at 10K users. Migration path to Auth.js exists. |
-| iOS Safari evicts PWA storage after 7 days idle | Medium — offline queue lost | Server is source of truth. Client cache is convenience only. |
-| Founders Pass race condition on last seats | Medium — overselling | Atomic `UPDATE ... WHERE sold_count < 500` with row-level locking. |
-| XSS accessing BYOK API key in localStorage | High — key theft | Isolate BYOK in Web Worker. Key never on main thread. |
-| Extension cookie auth failures | Medium — support burden | API token fallback. Health check endpoint. Clear error UX. |
-
-## Success Metrics
-
-- **Activation:** % of sign-ups who paste their first conversation within 24 hours
-- **Value delivery:** % of users who generate and copy a wake prompt
-- **Retention:** Weekly active users returning to update memories or generate new wake prompts
-- **Conversion:** Free → Pro conversion rate (target: 5-10% of active free users)
-- **Founders Pass:** Sell-through rate (target: sell out 500 seats within launch week)
-- **Product Hunt:** Top 5 of the day, 500+ upvotes
-- **Landing page:** Email waitlist conversion rate (target: 15-25% of visitors)
-
-## Future Considerations (Post-MVP)
-
-- **Auto-capture:** Background conversation monitoring (with explicit consent) — no manual capture needed
-- **AI-powered memory curation:** Ember automatically updates and refines memories over time
-- **Memory graph:** Visual relationship map between memories
-- **Team/shared profiles:** Enterprise use case — shared AI context for teams
-- **API marketplace:** Let developers build on Ember's memory API
-- **Multi-model wake prompts:** Optimize wake prompts for specific AI platforms (Claude vs ChatGPT vs Gemini)
-- **Safari Web Extension:** iOS desktop capture path
-- **Light mode:** Full light theme implementation (architecture supports it from day one)
-- **Row-Level Security:** Add RLS policies as defense-in-depth for multi-tenancy when approaching 10K users
-- **Memory embedding vectors:** For future fuzzy dedup and semantic search across memories
-
-## References & Research
-
-### Internal References
-- Context document: `ember_context_document_final_markdown.md`
-- UI/UX recommendations: `docs/plans/ui-ux-recommendations.md`
-
-### External References — Framework Documentation
-- [Next.js 16 PWA Guide](https://github.com/vercel/next.js/blob/v16.1.5/docs/01-app/02-guides/progressive-web-apps.mdx)
-- [MDN — Web Share Target API](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/share_target)
-- [Chrome for Developers — Web Share Target](https://developer.chrome.com/docs/capabilities/web-apis/web-share-target)
-- [Chrome for Developers — Manifest V3 Service Workers](https://developer.chrome.com/docs/extensions/develop/migrate/to-service-workers)
-- [Tailwind CSS v4 Dark Mode](https://tailwindcss.com/docs/dark-mode)
-- [Clerk Next.js App Router Quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart)
-- [Drizzle ORM + Neon Connection](https://orm.drizzle.team/docs/connect-neon)
-- [Anthropic SDK Browser/CORS Support](https://simonwillison.net/2024/Aug/23/anthropic-dangerous-direct-browser-access/)
-- [Serwist — Next.js PWA Service Workers](https://serwist.pages.dev/)
-
-### External References — Platform Limitations
-- [WebKit Bug #194593 — Web Share Target API](https://bugs.webkit.org/show_bug.cgi?id=194593) (not implemented in Safari)
-- [PWA on iOS — Current Status & Limitations](https://brainhub.eu/library/pwa-on-ios)
-
-### External References — Security & Ethics
-- [Chrome Extensions Harvesting AI Conversations (Dec 2025)](https://thehackernews.com/2025/12/featured-chrome-browser-extension.html)
-- [Firefox Extension Workshop — User Data Consents](https://extensionworkshop.com/documentation/develop/best-practices-for-collecting-user-data-consents/)
-
-### External References — Pricing
-- [SaaS Pricing Strategy Guide 2026](https://www.momentumnexus.com/blog/saas-pricing-strategy-guide-2026/)
-- [SaaS Lifetime Deal Pricing Strategy](https://startupspells.com/p/saas-lifetime-deals-pricing-strategy/)
-
-### Deepening Research Sources
-- Architecture Review: 11 architectural recommendations with SOLID compliance analysis
-- Security Audit: 30 vulnerabilities (4 critical, 12 high, 14 medium)
-- Performance Analysis: Full benchmark table with P50/P99 targets, 10 prioritized optimizations
-- TypeScript Review: Monorepo tsconfig patterns, ActionState<T>, Zod validation, RSC serialization
-- Simplicity Review: 15 YAGNI violations identified, ~70% scope reduction path
-- Data Integrity Review: 9 critical issues, 7 significant concerns, 12 targeted recommendations
-- Pattern Recognition: 8 architectural patterns analyzed, 5 anti-patterns identified
-- Stripe Integration: Custom checkout patterns, atomic inventory tracking, webhook verification
-- PWA/Mobile Research: Serwist, share target handlers, iOS Shortcut auth, safe area insets
-- Frontend Design: Full UI/UX system with color variables, typography, animation philosophy
+### Product Constraints
+- 14 product owner constraints (2026-02-10) defining capture methods, dual extraction, categorized stores, compression model, token transparency, and competitive positioning
+- 3-reviewer feedback (DHH, Kieran, Simplicity) recommending single app, lean schema, sync-where-possible
+- Co-founder (Vera) feedback on pricing, landing page, launch strategy
