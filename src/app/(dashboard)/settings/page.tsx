@@ -2,12 +2,28 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { UserProfile } from "@clerk/nextjs";
 import { ensureUser } from "@/lib/actions/profiles";
+import { db } from "@/lib/db";
+import { apiTokens } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { ApiTokenManager } from "@/components/api-token-manager";
 
 export default async function SettingsPage() {
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
   const user = await ensureUser(clerkId);
+
+  const tokens = await db.query.apiTokens.findMany({
+    where: eq(apiTokens.userId, user.id),
+    columns: {
+      id: true,
+      name: true,
+      scopes: true,
+      lastUsedAt: true,
+      createdAt: true,
+    },
+    orderBy: (apiTokens, { desc }) => [desc(apiTokens.createdAt)],
+  });
 
   return (
     <div>
@@ -44,6 +60,20 @@ export default async function SettingsPage() {
           </div>
         </section>
 
+        {/* API Tokens */}
+        <section>
+          <h2 className="font-display text-xl font-semibold text-ember-text">
+            API Tokens
+          </h2>
+          <p className="mt-1 text-sm text-ember-text-muted">
+            Create tokens to access your memories from AI agents, CLI tools, or
+            MCP servers.
+          </p>
+          <div className="mt-4">
+            <ApiTokenManager initialTokens={tokens} />
+          </div>
+        </section>
+
         {/* Clerk profile management */}
         <section>
           <h2 className="font-display text-xl font-semibold text-ember-text">
@@ -54,7 +84,8 @@ export default async function SettingsPage() {
               appearance={{
                 elements: {
                   rootBox: "w-full",
-                  cardBox: "shadow-none border border-ember-border-subtle rounded-2xl",
+                  cardBox:
+                    "shadow-none border border-ember-border-subtle rounded-2xl",
                 },
               }}
             />
