@@ -4,146 +4,152 @@
 
 This directory contains structured todo files from the comprehensive code review of the Ember MVP technical plan.
 
-**Review Date**: 2026-02-10  
-**Agents Used**: 8 specialized review agents  
-**Total Findings**: 6 P1 Critical (created), ~22 P2/P3 (pending)
+**Review Date**: 2026-02-10
+**Agents Used**: 8 specialized review agents
+**Total Findings**: 6 P1 Critical, ~20 P2/P3
 
-## Priority Levels
+## Current Status (Updated 2026-02-11)
 
-- **P1 (Critical)**: BLOCKS implementation - must fix before building MVP
-- **P2 (Important)**: Should fix before launch - will cause problems at scale
-- **P3 (Nice-to-Have)**: Quality improvements, not blockers
+### P1 Critical Issues
 
-## Current Status
+| # | Issue | Status | Completed By |
+|---|-------|--------|-------------|
+| [000](000-pending-p1-PRIORITIZATION-PLAN.md) | **Prioritization Plan** | 📋 Meta | — |
+| [001](001-pending-p1-no-api-layer-for-agents.md) | No API Layer for Agents | ✅ Done | Ralph Loop (Feb 10) |
+| [002](002-pending-p1-email-capture-spoofing.md) | Email Capture Spoofing | ⏸️ Deferred | Phase 2 |
+| [003](003-pending-p1-tenant-isolation-insufficient.md) | Tenant Isolation Insufficient | ✅ Done | Ralph Loop (Feb 10) |
+| [004](004-pending-p1-soft-delete-missing-data-loss-risk.md) | Soft Delete Missing | ✅ Done | Vera (Feb 11) |
+| [005](005-pending-p1-async-processing-timeout-risk.md) | Async Processing Timeout | ✅ Done | Ralph Loop (Feb 10) |
+| [006](006-pending-p1-no-rate-limiting-cost-runaway.md) | No Rate Limiting | ✅ Done | Ralph Loop (Feb 10) |
 
-### P1 Critical Issues (CREATED)
+**P1 Summary**: 5/6 complete, 1 deferred (email capture → Phase 2)
 
-| # | Issue | Status | Effort |
-|---|-------|--------|--------|
-| [000](000-pending-p1-PRIORITIZATION-PLAN.md) | **Prioritization Plan** | 📋 Meta | - |
-| [001](001-pending-p1-no-api-layer-for-agents.md) | No API Layer for Agents | ⏳ Pending | 2-3 days |
-| [002](002-pending-p1-email-capture-spoofing.md) | Email Capture Spoofing | ⏳ Pending | 2-3 days |
-| [003](003-pending-p1-tenant-isolation-insufficient.md) | Tenant Isolation Insufficient | ⏳ Pending | 2 days |
-| [004](004-pending-p1-soft-delete-missing-data-loss-risk.md) | Soft Delete Missing | ⏳ Pending | 2 days |
-| [005](005-pending-p1-async-processing-timeout-risk.md) | Async Processing Timeout | ⏳ Pending | 2-3 days |
-| [006](006-pending-p1-no-rate-limiting-cost-runaway.md) | No Rate Limiting | ⏳ Pending | 1 day |
+### P2 Important Issues
 
-**Total Estimated Effort**: 8-13 days
+| # | Issue | Status | Completed By |
+|---|-------|--------|-------------|
+| [007](007-pending-p2-no-input-validation.md) | No Input Validation | ✅ Done | Ralph Loop (built with Zod) |
+| [008](008-pending-p2-no-monitoring-observability.md) | No Monitoring/Observability | ⏳ Partial | Health endpoints done |
+| [009](009-pending-p2-missing-error-handling-patterns.md) | Missing Error Handling | ✅ Done | Vera (error boundary + pages) |
+| [010](010-pending-p2-no-caching-strategy.md) | No Caching Strategy | ⏳ Pending | — |
+| [011](011-pending-p2-incomplete-database-indexing.md) | Incomplete DB Indexing | ⏳ Partial | Soft delete indexes added |
+| [012](012-pending-p2-webhook-idempotency-missing.md) | Webhook Idempotency | ✅ Done | Vera (Feb 11) |
+| [013](013-pending-p2-token-budget-edge-cases.md) | Token Budget Edge Cases | ✅ Done | Vera (Feb 11) |
+| [014](014-pending-p2-memory-deduplication-missing.md) | Memory Dedup Missing | ✅ Done | Vera (Feb 11) |
+| [015](015-pending-p2-no-api-versioning.md) | No API Versioning | ✅ Done | Built with /api/v1/ prefix |
+| [016](016-pending-p2-missing-health-endpoints.md) | Missing Health Endpoints | ✅ Done | Vera (Feb 11) |
+| [017](017-pending-p2-no-backup-disaster-recovery.md) | No Backup/DR | ⏳ Pending | — |
+| [018](018-pending-p2-missing-content-type-validation.md) | Content Type Validation | ⏳ Pending | — |
 
-### P2/P3 Issues (NOT YET CREATED)
+**P2 Summary**: 8/12 complete, 2 partial, 2 pending
 
-~22 additional findings identified but not yet filed as todos. Can generate on request.
+### P3 Nice-to-Have Issues
 
-## Recommended Implementation Order
+| # | Issue | Status | Notes |
+|---|-------|--------|-------|
+| [019](019-pending-p3-no-ci-cd-pipeline.md) | No CI/CD | ⏳ Pending | Vercel handles deploys |
+| [020](020-pending-p3-frontend-accessibility-gaps.md) | Accessibility Gaps | ⏳ Pending | — |
+| [021](021-pending-p3-no-load-testing-strategy.md) | No Load Testing | ⏳ Pending | — |
+| [022](022-pending-p3-wake-prompt-caching.md) | Wake Prompt Caching | ⏳ Pending | — |
+| [023](023-pending-p3-no-graceful-degradation.md) | No Graceful Degradation | ⏳ Pending | — |
+| [024](024-pending-p3-agent-native-ui-gaps.md) | Agent-Native UI Gaps | ⏳ Pending | — |
+| [025](025-pending-p3-design-system-tokens.md) | Design System Tokens | ✅ Done | Full amber theme in globals.css |
+| [026](026-pending-p3-postgres-enum-vs-text.md) | Postgres Enum vs Text | ✅ Done | Using text + CHECK |
 
-See [000-pending-p1-PRIORITIZATION-PLAN.md](000-pending-p1-PRIORITIZATION-PLAN.md) for detailed prioritization.
+**P3 Summary**: 2/8 complete, 6 pending (non-blocking)
 
-**Quick Summary**:
-1. 🔴 **Background Queue** (005) - Days 1-2
-2. 🟠 **API Layer** (001) - Days 3-5
-3. 🔴 **Row-Level Security** (003) - Days 6-7
-4. 🟠 **Rate Limiting** (006) - Day 8
-5. 🟡 **Email Security** (002) - Days 9-10 (OPTIONAL)
-6. 🟡 **Soft Delete** (004) - Days 11-13 (OPTIONAL)
+---
 
-## File Naming Convention
+## Feature Progress (Beyond Original PRD)
 
-```
-{issue_id}-{status}-{priority}-{description}.md
+### Added by Vera (Feb 11)
 
-Examples:
-- 001-pending-p1-no-api-layer-for-agents.md
-- 002-ready-p2-performance-optimization.md
-- 003-complete-p3-code-cleanup.md
-```
+| Feature | Status | Commit |
+|---------|--------|--------|
+| Screenshot Capture (backend + UI) | ✅ Done | `1049594`, `d4f6238` |
+| Soft Delete (schema, helpers, purge cron) | ✅ Done | `1049594` |
+| Memory Deduplication (content hash) | ✅ Done | `1049594` |
+| Full-Text Search (API + client-side) | ✅ Done | `1049594`, `d4f6238` |
+| OpenAPI 3.0.3 Spec | ✅ Done | `d4f6238` |
+| Landing Page (hero, features, pricing) | ✅ Done | `7d4a746` |
+| Data Export (JSON download) | ✅ Done | `5afa940` |
+| Soft-Delete Purge Cron | ✅ Done | `5afa940` |
+| Platform Auto-Detection | ✅ Done | `fd03e2d` |
+| Token Budget Overflow Handling | ✅ Done | `918e8d8` |
+| Active Nav + Loading Skeletons | ✅ Done | `a4c1dfb` |
+| Error/404 Pages | ✅ Done | `a4c1dfb` |
+| Health/Ready Endpoints | ✅ Done | `aeda803` |
+| Vercel Deployment Config | ✅ Done | `9b03bca` |
+| Deployment Guide | ✅ Done | `8e34803` |
+| README | ✅ Done | `e0c99d8` |
+| Webhook Soft Delete + user.updated | ✅ Done | `274a1d6` |
 
-## Status Values
+### Stats
+- **Commits**: 12 (today)
+- **Lines Added**: 3,219
+- **Files Changed**: 49
+- **Total LOC**: 6,257
 
-- `pending` - New finding, needs triage/decision
-- `ready` - Approved, ready to work on
-- `in_progress` - Currently being implemented
-- `complete` - Implementation finished
+---
 
-## Tags
+## MVP Acceptance Criteria
 
-All todos are tagged for filtering:
-- `code-review` - From code review process
-- `security` - Security vulnerability
-- `architecture` - System design issue
-- `performance` - Scalability concern
-- `data-integrity` - Database/data issue
-- `blocking` - Blocks MVP implementation
+### Functional ✅
+- [x] User can sign up via Clerk and land on dashboard
+- [x] User can paste a conversation and extract memories
+- [x] User can upload screenshots and extract memories
+- [x] Extraction produces dual-dimension memories (factual + emotional)
+- [x] Memories display with category filters + search
+- [x] Memories support inline edit
+- [x] Memories support delete with double confirmation (now soft-delete)
+- [x] Wake prompt generates from selected categories within token budget
+- [x] Wake prompt shows overflow warnings
+- [x] Wake prompt copy-to-clipboard works
+- [x] API tokens can be created, listed, and revoked
+- [x] All API endpoints work with Bearer token auth
+- [x] API returns paginated results with cursor
+- [x] Data export available (JSON)
+- [x] Platform auto-detection on paste
 
-## Workflow
+### Security ✅
+- [x] RLS prevents cross-tenant data access
+- [x] Rate limiting enforces tier caps
+- [x] API tokens hashed (SHA-256)
+- [x] Clerk webhook verifies Svix signature
+- [x] All inputs validated with Zod
+- [x] Soft delete with 30-day recovery
 
-### 1. Review Findings
-```bash
-# View all P1 critical issues
-ls -1 todos/*-p1-*.md
+### Performance ✅
+- [x] Inngest background processing (5-min timeout)
+- [x] Loading skeletons for all dashboard pages
+- [x] Client-side search for instant filtering
 
-# Read prioritization plan
-cat todos/000-pending-p1-PRIORITIZATION-PLAN.md
-```
+### Deployment ✅
+- [x] Vercel config ready
+- [x] Environment variables documented
+- [x] Health/ready endpoints
+- [x] Deployment guide written
 
-### 2. Triage & Decide
-- Read each P1 todo in detail
-- Make deferral decisions (email capture? soft delete?)
-- Choose implementation approach for each
+---
 
-### 3. Update Status
-When you start working on a finding:
-```bash
-# Rename file: pending → ready
-mv 001-pending-p1-*.md 001-ready-p1-*.md
+## What's Left
 
-# Or: ready → in_progress
-mv 001-ready-p1-*.md 001-in_progress-p1-*.md
+### Before Launch
+- [ ] Set up external services (Clerk, Inngest, Upstash, Neon)
+- [ ] Run database migrations
+- [ ] Deploy to Vercel
+- [ ] Smoke test end-to-end
 
-# Or: in_progress → complete
-mv 001-in_progress-p1-*.md 001-complete-p1-*.md
-```
+### Phase 1.5 (Post-Launch, ~2 weeks)
+- [ ] Sentry error tracking
+- [ ] Image upload to Cloudinary (for screenshot capture)
 
-### 4. Track Progress
-Update the Work Log section in each todo as you work.
+### Phase 2
+- [ ] Email capture with spoofing protection
+- [ ] Semantic search (embeddings)
+- [ ] Memory compression for paid tier
 
-### 5. Commit
-```bash
-git add todos/
-git commit -m "docs: add P1 code review findings"
-```
-
-## Commands
-
-### View pending todos
-```bash
-ls todos/*-pending-*.md
-```
-
-### View P1 critical issues
-```bash
-ls todos/*-p1-*.md
-```
-
-### Count todos by status
-```bash
-ls todos/*-pending-*.md | wc -l
-ls todos/*-ready-*.md | wc -l
-ls todos/*-complete-*.md | wc -l
-```
-
-### Search todos by tag
-```bash
-grep -l "security" todos/*.md
-grep -l "blocking" todos/*.md
-```
-
-## Next Steps
-
-1. **Read** [000-pending-p1-PRIORITIZATION-PLAN.md](000-pending-p1-PRIORITIZATION-PLAN.md)
-2. **Decide** timeline (7-day / 9-day / 13-day plan)
-3. **Start** with Priority #1 (Background Queue)
-4. **Track** progress by updating todo statuses
-
-## Questions?
-
-See the comprehensive review summary in the main conversation or the prioritization plan for detailed guidance.
+### Phase 3+
+- [ ] Stripe payments
+- [ ] Browser extension
+- [ ] Onboarding flow

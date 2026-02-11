@@ -1,5 +1,7 @@
 ---
 status: deferred
+deferred_to: Phase 2
+note: Email capture not in MVP
 priority: p1
 issue_id: "002"
 tags: [code-review, security, email, authentication, vulnerability, deferred-phase-2]

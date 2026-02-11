@@ -1,5 +1,7 @@
 ---
-status: pending
+status: done
+completed_at: 2026-02-11
+completed_by: Vera
 priority: p2
 issue_id: "013"
 tags: [code-review, architecture, token-management, edge-cases]

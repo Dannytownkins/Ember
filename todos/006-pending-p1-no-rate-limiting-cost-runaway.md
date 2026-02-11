@@ -1,5 +1,7 @@
 ---
-status: pending
+status: done
+completed_at: 2026-02-10
+completed_by: Ralph Loop Agent
 priority: p1
 issue_id: "006"
 tags: [code-review, security, performance, cost-control, dos]
