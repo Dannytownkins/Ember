@@ -17,11 +17,15 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
-  // Only redirect when real auth is configured (Clerk)
+  // Redirect authenticated users to dashboard
   if (process.env.CLERK_SECRET_KEY) {
-    const userId = await getAuthUserId();
-    if (userId) {
-      redirect("/memories");
+    try {
+      const userId = await getAuthUserId();
+      if (userId) {
+        redirect("/memories");
+      }
+    } catch {
+      // Not authenticated — show landing page
     }
   }
 
