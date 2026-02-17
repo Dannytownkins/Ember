@@ -6,9 +6,9 @@ import { UserButton } from "@clerk/nextjs";
 import { NavLink } from "@/components/nav-link";
 
 const navItems = [
-  { href: "/memories", label: "Memories", icon: Brain },
-  { href: "/capture", label: "Capture", icon: ClipboardPaste },
-  { href: "/wake", label: "Wake", icon: Flame },
+  { href: "/memories", label: "Embers", icon: Brain },
+  { href: "/capture", label: "Gather", icon: ClipboardPaste },
+  { href: "/wake", label: "Kindle", icon: Flame },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

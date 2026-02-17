@@ -120,7 +120,7 @@ export function WakePromptGenerator({
 
       {/* Token budget display */}
       <div className="flex items-center justify-between rounded-xl bg-ember-surface-raised px-4 py-3">
-        <span className="text-sm text-ember-text-secondary">Token budget</span>
+        <span className="text-sm text-ember-text-secondary">Memory size</span>
         <span className="text-sm font-medium text-ember-amber">
           {tokenBudget.toLocaleString()} tokens
         </span>
@@ -132,7 +132,7 @@ export function WakePromptGenerator({
         disabled={selected.size === 0 || isPending}
         className="w-full rounded-xl bg-ember-amber-600 py-3 font-semibold text-ember-bg shadow-ember-glow transition-all duration-300 hover:bg-ember-amber hover:shadow-ember-glow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       >
-        {isPending ? "Generating..." : "Generate Wake Prompt"}
+        {isPending ? "Kindling..." : "🔥 Kindle Your Prompt"}
       </button>
 
       {error && (
@@ -169,7 +169,7 @@ export function WakePromptGenerator({
               onClick={handleCopy}
               className="rounded-lg border border-ember-border px-3 py-1.5 text-xs font-medium text-ember-text-secondary transition-colors hover:border-ember-amber/30 hover:text-ember-text"
             >
-              {copied ? "Copied!" : "Copy"}
+              {copied ? "🔥 Kindled!" : "Copy to Kindle"}
             </button>
           </div>
           <pre className="max-h-96 overflow-auto rounded-2xl border border-ember-border-subtle bg-ember-surface p-4 font-mono text-xs leading-relaxed text-ember-text-secondary">

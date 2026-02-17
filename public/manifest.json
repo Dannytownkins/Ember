@@ -1,0 +1,24 @@
+{
+  "name": "Ember — AI Memory",
+  "short_name": "Ember",
+  "description": "Stop re-introducing yourself to AI. Carry your Embers everywhere.",
+  "start_url": "/memories",
+  "display": "standalone",
+  "background_color": "#0f0f11",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

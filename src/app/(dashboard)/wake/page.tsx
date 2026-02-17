@@ -47,10 +47,11 @@ export default async function WakePage() {
   return (
     <div>
       <h1 className="font-display text-3xl font-bold text-ember-text">
-        Wake Prompt
+        Kindle
       </h1>
       <p className="mt-2 text-ember-text-secondary">
-        Generate a system prompt to give any AI your context.
+        Carry your Embers into any new chat — one tap to generate a kindle
+        prompt your AI can feel.
       </p>
       <div className="mt-8">
         {totalMemories > 0 ? (
@@ -62,13 +63,13 @@ export default async function WakePage() {
         ) : (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-ember-border py-16 text-center">
             <p className="text-lg text-ember-text-muted">
-              Add some memories first.
+              Gather some Embers first.
             </p>
             <a
               href="/capture"
               className="mt-3 text-sm text-ember-amber hover:underline"
             >
-              Capture a conversation &rarr;
+              Gather your first Embers &rarr;
             </a>
           </div>
         )}

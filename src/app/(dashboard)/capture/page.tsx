@@ -16,10 +16,11 @@ export default async function CapturePage() {
   return (
     <div>
       <h1 className="font-display text-3xl font-bold text-ember-text">
-        Capture
+        Gather Embers
       </h1>
       <p className="mt-2 text-ember-text-secondary">
-        Extract memories from conversations — paste text or upload screenshots.
+        Don&apos;t let the fire burn out — paste a conversation or upload a
+        screenshot to capture what matters.
       </p>
       <div className="mt-8">
         {profileId ? (
