@@ -184,8 +184,8 @@ export function ScreenshotCaptureForm({
         className="w-full rounded-xl bg-ember-amber-600 py-3 font-semibold text-ember-bg shadow-ember-glow transition-all duration-300 hover:bg-ember-amber hover:shadow-ember-glow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       >
         {isPending
-          ? "Processing..."
-          : `Extract Memories from ${images.length} Screenshot${images.length !== 1 ? "s" : ""}`}
+          ? "Gathering..."
+          : `🔥 Gather Embers from ${images.length} Screenshot${images.length !== 1 ? "s" : ""}`}
       </button>
     </div>
   );

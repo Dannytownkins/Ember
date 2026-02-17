@@ -14,16 +14,16 @@ type CaptureStatusResponse = {
 };
 
 const STAGES = [
-  { status: "queued", label: "Queued", description: "Waiting to process..." },
+  { status: "queued", label: "Queued", description: "Your conversation is warming up..." },
   {
     status: "processing",
-    label: "Extracting",
-    description: "Claude is reading your conversation...",
+    label: "Forming Embers",
+    description: "Extracting facts and feelings from your conversation...",
   },
   {
     status: "completed",
-    label: "Complete",
-    description: "Memories extracted!",
+    label: "Embers Ready",
+    description: "Your memories are glowing.",
   },
 ];
 
@@ -118,20 +118,20 @@ export function ProcessingIndicator({
       {currentStatus === "completed" && status && (
         <div className="rounded-2xl border border-ember-success/20 bg-ember-success/5 p-5 text-center">
           <p className="text-lg font-semibold text-ember-success">
-            {status.memoryCount} memories extracted
+            🔥 {status.memoryCount} embers gathered
           </p>
           <div className="mt-4 flex items-center justify-center gap-3">
             <Link
               href="/memories"
               className="rounded-xl bg-ember-amber-600 px-6 py-2.5 text-sm font-semibold text-ember-bg transition-colors hover:bg-ember-amber"
             >
-              View Memories
+              View your Embers
             </Link>
             <button
               onClick={onReset}
               className="rounded-xl border border-ember-border px-6 py-2.5 text-sm font-semibold text-ember-text-secondary transition-colors hover:text-ember-text"
             >
-              Capture More
+              Gather More
             </button>
           </div>
         </div>

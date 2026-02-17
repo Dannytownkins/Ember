@@ -56,7 +56,7 @@ export function CaptureForm({ profileId }: { profileId: string }) {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste your conversation here... (minimum 100 characters)"
+          placeholder="Paste your conversation here to gather embers... (minimum 100 characters)"
           rows={12}
           className="w-full resize-y rounded-2xl border border-ember-border bg-ember-surface-raised p-4 text-sm leading-relaxed text-ember-text placeholder:text-ember-text-muted focus:border-ember-amber/40 focus:outline-none focus:ring-1 focus:ring-ember-amber/20"
         />
@@ -96,7 +96,7 @@ export function CaptureForm({ profileId }: { profileId: string }) {
         disabled={!isValid || isPending}
         className="w-full rounded-xl bg-ember-amber-600 py-3 font-semibold text-ember-bg shadow-ember-glow transition-all duration-300 hover:bg-ember-amber hover:shadow-ember-glow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
       >
-        {isPending ? "Submitting..." : "Extract Memories"}
+        {isPending ? "Gathering..." : "🔥 Gather Embers"}
       </button>
     </div>
   );
