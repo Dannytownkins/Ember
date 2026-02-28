@@ -318,9 +318,6 @@ function PricingCard({
         <span className="font-display text-3xl font-bold text-ember-amber">
           {price}
         </span>
-        {price !== "$99 once" && price !== "$0" && (
-          <span className="text-sm text-ember-text-muted">/month</span>
-        )}
       </p>
       <ul className="mt-6 space-y-2">
         {features.map((feature) => (
