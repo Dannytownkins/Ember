@@ -13,6 +13,7 @@ import {
   ClipboardPaste,
   Sparkles,
 } from "lucide-react";
+import { LiveDemo } from "@/components/live-demo";
 
 export const dynamic = "force-dynamic";
 
@@ -140,6 +141,9 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Live Demo */}
+      <LiveDemo />
 
       {/* Features */}
       <section className="border-t border-ember-border-subtle px-6 py-24">
