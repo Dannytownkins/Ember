@@ -1,5 +1,14 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardHome() {
-  redirect("/memories");
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/memories");
+  }, [router]);
+
+  return null;
 }
