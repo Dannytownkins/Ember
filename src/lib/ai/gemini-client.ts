@@ -10,10 +10,10 @@ export const genAI = new GoogleGenerativeAI(apiKey ?? "");
 
 // Flash model — fast, free tier, great for structured extraction
 export const flashModel = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+  model: "gemini-flash-latest",
 });
 
 // Pro model — fallback for complex extractions if needed
 export const proModel = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",  // Stay on flash for now, upgrade if needed
+  model: "gemini-flash-latest",  // Stay on flash for now, upgrade if needed
 });
