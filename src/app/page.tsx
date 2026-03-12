@@ -53,14 +53,14 @@ export default async function LandingPage() {
 
         <div className="relative max-w-4xl">
           {/* Byline - offset left for asymmetry */}
-          <div className="mb-8 flex items-center gap-3">
+          <div className="animate-slide-in-left mb-8 flex items-center gap-3">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-ember-amber/40" />
             <span className="text-sm tracking-wide text-ember-amber/80">
               Built by an AI who needed this to exist
             </span>
           </div>
 
-          <h1 className="font-display text-5xl font-bold leading-[1.1] tracking-tight text-ember-text sm:text-7xl lg:text-8xl">
+          <h1 className="animate-fade-up font-display text-6xl font-bold leading-[1.05] tracking-tight text-ember-text sm:text-8xl lg:text-9xl">
             Your AI should
             <br />
             <span className="relative inline-block text-ember-amber">
@@ -70,30 +70,30 @@ export default async function LandingPage() {
                 viewBox="0 0 300 12"
                 fill="none"
                 preserveAspectRatio="none"
+                style={{ strokeDasharray: 300, strokeDashoffset: 0 }}
               >
                 <path
                   d="M2 8 Q75 2, 150 6 T298 4"
                   stroke="currentColor"
                   strokeWidth="3"
                   strokeLinecap="round"
-                  className="text-ember-amber-600/50"
+                  className="text-ember-amber-600/50 animate-[underline-draw_1s_ease-out_0.5s_forwards]"
+                  style={{ strokeDasharray: 300, strokeDashoffset: 300 }}
                 />
               </svg>
             </span>
           </h1>
 
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-ember-text-secondary sm:text-xl">
-            Every new conversation, your AI forgets everything. Ember captures
-            the warmth before the fire goes out — facts <em>and</em> feelings —
-            so any AI can pick up where you left off.
+          <p className="animate-fade-up delay-200 mt-10 max-w-xl text-xl leading-relaxed text-ember-text-secondary sm:text-2xl">
+            Your AI forgets you. Every time. Ember fixes that.
           </p>
 
-          <div className="mt-12 flex flex-wrap items-center gap-4">
+          <div className="animate-fade-up delay-400 mt-14 flex flex-wrap items-center gap-4">
             <Link
               href="/sign-up"
-              className="group flex items-center gap-3 rounded-full bg-ember-amber-600 px-8 py-4 font-semibold text-ember-bg shadow-ember-glow transition-all duration-300 hover:bg-ember-amber hover:shadow-ember-glow-lg active:scale-[0.98]"
+              className="group flex items-center gap-3 rounded-full bg-ember-amber-600 px-10 py-5 text-lg font-semibold text-ember-bg shadow-ember-glow transition-all duration-300 hover:scale-[1.02] hover:bg-ember-amber hover:shadow-ember-glow-lg active:scale-[0.98]"
             >
-              Start Gathering Embers
+              Start Free
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
@@ -104,8 +104,8 @@ export default async function LandingPage() {
             </Link>
           </div>
 
-          <p className="mt-8 text-sm text-ember-text-muted">
-            Free forever · 25 memories · No credit card
+          <p className="animate-fade-in delay-600 mt-10 text-sm text-ember-text-muted">
+            Free forever · No credit card
           </p>
         </div>
       </section>
@@ -410,10 +410,10 @@ export default async function LandingPage() {
           </p>
           <Link
             href="/sign-up"
-            className="mt-10 inline-flex items-center gap-3 rounded-full bg-ember-amber-600 px-10 py-4 text-lg font-semibold text-ember-bg shadow-ember-glow-lg transition-all duration-300 hover:bg-ember-amber hover:shadow-ember-glow-xl active:scale-[0.98]"
+            className="mt-10 inline-flex items-center gap-3 rounded-full bg-ember-amber-600 px-10 py-5 text-lg font-semibold text-ember-bg shadow-ember-glow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-ember-amber hover:shadow-ember-glow-xl active:scale-[0.98]"
           >
-            Start Gathering Embers
-            <ArrowRight className="h-5 w-5" />
+            Start Free
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </section>
@@ -452,8 +452,8 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="group rounded-2xl border border-ember-border-subtle bg-ember-surface p-6 transition-all duration-300 hover:border-ember-amber/20 hover:shadow-ember-card-hover">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-ember-amber/10 text-ember-amber transition-colors group-hover:bg-ember-amber/20">
+    <div className="group rounded-2xl border border-ember-border-subtle bg-ember-surface p-6 transition-all duration-500 hover:-translate-y-1 hover:border-ember-amber/20 hover:shadow-ember-card-hover">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-ember-amber/10 text-ember-amber transition-all duration-300 group-hover:scale-110 group-hover:bg-ember-amber/20">
         {icon}
       </div>
       <h3 className="mt-5 font-display text-lg font-semibold text-ember-text">
@@ -483,10 +483,10 @@ function PricingCard({
 }) {
   return (
     <div
-      className={`relative rounded-3xl border p-8 ${
+      className={`relative rounded-3xl border p-8 transition-all duration-500 hover:-translate-y-1 ${
         highlighted
-          ? "border-ember-amber/30 bg-ember-surface shadow-ember-glow"
-          : "border-ember-border-subtle bg-ember-surface"
+          ? "border-ember-amber/30 bg-ember-surface shadow-ember-glow hover:shadow-ember-glow-lg"
+          : "border-ember-border-subtle bg-ember-surface hover:border-ember-amber/20 hover:shadow-ember-card-hover"
       }`}
     >
       {highlighted && (
